@@ -2,10 +2,9 @@
   "name": "capacitor-plugin-applemusic",
   "version": "0.0.1",
   "description": "capacitor plugin apple music",
-  "main": "dist/plugin.cjs.js",
+  "main": "dist/plugin.js",
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
-  "unpkg": "dist/plugin.js",
   "files": [
     "android/src/main/",
     "android/build.gradle",

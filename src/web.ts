@@ -1,4 +1,4 @@
-import { WebPlugin } from '@capacitor/core';
+import { WebPlugin, registerPlugin } from '@capacitor/core';
 
 import type { CapacitorAppleMusicPlugin } from './definitions';
 
@@ -10,3 +10,11 @@ export class CapacitorAppleMusicWeb
     return options;
   }
 }
+
+const CapacitorAppleMusic = registerPlugin<CapacitorAppleMusicPlugin>(
+  'CapacitorAppleMusic',
+  {
+    web: () => import('./web').then(m => new m.CapacitorAppleMusicWeb()),
+  },
+);
+export { CapacitorAppleMusic };

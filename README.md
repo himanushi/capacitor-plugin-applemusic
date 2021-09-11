@@ -14,6 +14,7 @@ npx cap sync
 <docgen-index>
 
 * [`echo(...)`](#echo)
+* [`configure(...)`](#configure)
 
 </docgen-index>
 
@@ -29,6 +30,21 @@ echo(options: { value: string; }) => any
 | Param         | Type                            |
 | ------------- | ------------------------------- |
 | **`options`** | <code>{ value: string; }</code> |
+
+**Returns:** <code>any</code>
+
+--------------------
+
+
+### configure(...)
+
+```typescript
+configure(config: MusicKit.Config) => any
+```
+
+| Param        | Type                |
+| ------------ | ------------------- |
+| **`config`** | <code>Config</code> |
 
 **Returns:** <code>any</code>
 

@@ -9,6 +9,16 @@ export class CapacitorAppleMusicWeb
     console.log('ECHO', options);
     return options;
   }
+
+  async configure(config: MusicKit.Config): Promise<boolean> {
+    let configured = false;
+    try {
+      configured = Boolean(await MusicKit.configure(config));
+    } catch (error) {
+      console.log(error);
+    }
+    return configured;
+  }
 }
 
 const CapacitorAppleMusic = registerPlugin<CapacitorAppleMusicPlugin>(
@@ -17,4 +27,5 @@ const CapacitorAppleMusic = registerPlugin<CapacitorAppleMusicPlugin>(
     web: () => import('./web').then(m => new m.CapacitorAppleMusicWeb()),
   },
 );
+
 export { CapacitorAppleMusic };

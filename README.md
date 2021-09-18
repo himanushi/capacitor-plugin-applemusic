@@ -15,6 +15,7 @@ npx cap sync
 
 * [`echo(...)`](#echo)
 * [`configure(...)`](#configure)
+* [`isAuthorized()`](#isauthorized)
 
 </docgen-index>
 
@@ -45,6 +46,17 @@ configure(config: MusicKit.Config) => any
 | Param        | Type                |
 | ------------ | ------------------- |
 | **`config`** | <code>Config</code> |
+
+**Returns:** <code>any</code>
+
+--------------------
+
+
+### isAuthorized()
+
+```typescript
+isAuthorized() => any
+```
 
 **Returns:** <code>any</code>
 

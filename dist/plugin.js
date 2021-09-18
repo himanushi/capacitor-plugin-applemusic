@@ -17,6 +17,32 @@ var capacitorCapacitorAppleMusic = (function (exports, core) {
             }
             return configured;
         }
+        async isAuthorized() {
+            let authorized = false;
+            try {
+                authorized = MusicKit.getInstance().isAuthorized;
+            }
+            catch (error) {
+                console.log(error);
+            }
+            return authorized;
+        }
+        async authorize() {
+            try {
+                MusicKit.getInstance().authorize();
+            }
+            catch (error) {
+                console.log(error);
+            }
+        }
+        async unauthorize() {
+            try {
+                MusicKit.getInstance().unauthorize();
+            }
+            catch (error) {
+                console.log(error);
+            }
+        }
     }
     const CapacitorAppleMusic = core.registerPlugin('CapacitorAppleMusic', {
         web: () => Promise.resolve().then(function () { return web; }).then(m => new m.CapacitorAppleMusicWeb()),

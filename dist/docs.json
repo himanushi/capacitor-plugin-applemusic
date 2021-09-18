@@ -38,6 +38,16 @@
           "MusicKit"
         ],
         "slug": "configure"
+      },
+      {
+        "name": "isAuthorized",
+        "signature": "() => any",
+        "parameters": [],
+        "returns": "any",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [],
+        "slug": "isauthorized"
       }
     ],
     "properties": []

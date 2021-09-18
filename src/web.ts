@@ -29,6 +29,22 @@ export class CapacitorAppleMusicWeb
     }
     return authorized;
   }
+
+  async authorize(): Promise<void> {
+    try {
+      MusicKit.getInstance().authorize();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async unauthorize(): Promise<void> {
+    try {
+      MusicKit.getInstance().unauthorize();
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }
 
 const CapacitorAppleMusic = registerPlugin<CapacitorAppleMusicPlugin>(
@@ -61,5 +77,7 @@ declare namespace MusicKit {
   interface MusicKitInstance {
     storefrontId: string;
     readonly isAuthorized: boolean;
+    authorize: () => void;
+    unauthorize: () => void;
   }
 }

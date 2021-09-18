@@ -1,0 +1,47 @@
+{
+  "api": {
+    "name": "CapacitorAppleMusicPlugin",
+    "slug": "capacitorapplemusicplugin",
+    "docs": "",
+    "tags": [],
+    "methods": [
+      {
+        "name": "echo",
+        "signature": "(options: { value: string; }) => any",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "",
+            "type": "{ value: string; }"
+          }
+        ],
+        "returns": "any",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [],
+        "slug": "echo"
+      },
+      {
+        "name": "configure",
+        "signature": "(config: MusicKit.Config) => any",
+        "parameters": [
+          {
+            "name": "config",
+            "docs": "",
+            "type": "Config"
+          }
+        ],
+        "returns": "any",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "MusicKit"
+        ],
+        "slug": "configure"
+      }
+    ],
+    "properties": []
+  },
+  "interfaces": [],
+  "enums": []
+}

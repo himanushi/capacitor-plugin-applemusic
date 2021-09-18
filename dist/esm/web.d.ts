@@ -20,6 +20,8 @@ interface CapacitorAppleMusicPlugin {
     }>;
     configure(config: MusicKit.Config): Promise<boolean>;
     isAuthorized(): Promise<boolean>;
+    authorize(): Promise<void>;
+    unauthorize(): Promise<void>;
 }
 declare namespace MusicKit {
     interface Config {

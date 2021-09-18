@@ -48,6 +48,26 @@
         "docs": "",
         "complexTypes": [],
         "slug": "isauthorized"
+      },
+      {
+        "name": "authorize",
+        "signature": "() => any",
+        "parameters": [],
+        "returns": "any",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [],
+        "slug": "authorize"
+      },
+      {
+        "name": "unauthorize",
+        "signature": "() => any",
+        "parameters": [],
+        "returns": "any",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [],
+        "slug": "unauthorize"
       }
     ],
     "properties": []

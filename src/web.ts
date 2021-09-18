@@ -60,6 +60,8 @@ interface CapacitorAppleMusicPlugin {
   echo(options: { value: string }): Promise<{ value: string }>;
   configure(config: MusicKit.Config): Promise<boolean>;
   isAuthorized(): Promise<boolean>;
+  authorize(): Promise<void>;
+  unauthorize(): Promise<void>;
 }
 
 // ver: 3.2136.9-prerelease

@@ -1,6 +1,6 @@
 # capacitor-plugin-applemusic
 
-capacitor plugin apple music
+It is in the development stage. Please do not use it.
 
 ## Install
 
@@ -13,11 +13,11 @@ npx cap sync
 
 <docgen-index>
 
-* [`echo(...)`](#echo)
-* [`configure(...)`](#configure)
-* [`isAuthorized()`](#isauthorized)
-* [`authorize()`](#authorize)
-* [`unauthorize()`](#unauthorize)
+- [`echo(...)`](#echo)
+- [`configure(...)`](#configure)
+- [`isAuthorized()`](#isauthorized)
+- [`authorize()`](#authorize)
+- [`unauthorize()`](#unauthorize)
 
 </docgen-index>
 
@@ -36,8 +36,7 @@ echo(options: { value: string; }) => any
 
 **Returns:** <code>any</code>
 
---------------------
-
+---
 
 ### configure(...)
 
@@ -51,8 +50,7 @@ configure(config: MusicKit.Config) => any
 
 **Returns:** <code>any</code>
 
---------------------
-
+---
 
 ### isAuthorized()
 
@@ -62,8 +60,7 @@ isAuthorized() => any
 
 **Returns:** <code>any</code>
 
---------------------
-
+---
 
 ### authorize()
 
@@ -73,8 +70,7 @@ authorize() => any
 
 **Returns:** <code>any</code>
 
---------------------
-
+---
 
 ### unauthorize()
 
@@ -84,6 +80,6 @@ unauthorize() => any
 
 **Returns:** <code>any</code>
 
---------------------
+---
 
 </docgen-api>

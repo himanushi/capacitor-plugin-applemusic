@@ -10,40 +10,60 @@ export class CapacitorAppleMusicWeb
     return options;
   }
 
-  async configure(config: MusicKit.Config): Promise<boolean> {
+  async configure(config: MusicKit.Config): Promise<{ result: boolean }> {
     let configured = false;
     try {
       configured = Boolean(await MusicKit.configure(config));
     } catch (error) {
       console.log(error);
     }
-    return configured;
+    return { result: configured };
   }
 
-  async isAuthorized(): Promise<boolean> {
+  async isAuthorized(): Promise<{ result: boolean }> {
     let authorized = false;
     try {
       authorized = MusicKit.getInstance().isAuthorized;
     } catch (error) {
       console.log(error);
     }
-    return authorized;
+    return { result: authorized };
   }
 
-  async authorize(): Promise<void> {
+  async authorize(): Promise<{ result: boolean }> {
     try {
-      MusicKit.getInstance().authorize();
+      await MusicKit.getInstance().authorize();
     } catch (error) {
       console.log(error);
     }
+    return { result: true };
   }
 
-  async unauthorize(): Promise<void> {
+  async unauthorize(): Promise<{ result: boolean }> {
     try {
-      MusicKit.getInstance().unauthorize();
+      await MusicKit.getInstance().unauthorize();
     } catch (error) {
       console.log(error);
     }
+    return { result: true };
+  }
+
+  async setQueue(options: { songId: string }): Promise<{ result: boolean }> {
+    try {
+      await MusicKit.getInstance().setQueue({ songs: [options.songId] });
+    } catch (error) {
+      console.log(error);
+    }
+    return { result: true };
+  }
+
+  async play(): Promise<{ result: boolean }> {
+    try {
+      await MusicKit.getInstance().play();
+    } catch (error) {
+      console.log(error);
+    }
+    return { result: true };
   }
 }
 
@@ -58,10 +78,12 @@ export { CapacitorAppleMusic };
 
 interface CapacitorAppleMusicPlugin {
   echo(options: { value: string }): Promise<{ value: string }>;
-  configure(config: MusicKit.Config): Promise<boolean>;
-  isAuthorized(): Promise<boolean>;
-  authorize(): Promise<void>;
-  unauthorize(): Promise<void>;
+  configure(config: MusicKit.Config): Promise<{ result: boolean }>;
+  isAuthorized(): Promise<{ result: boolean }>;
+  authorize(): Promise<{ result: boolean }>;
+  unauthorize(): Promise<{ result: boolean }>;
+  setQueue(options: { songId: string }): Promise<{ result: boolean }>;
+  play(): Promise<{ result: boolean }>;
 }
 
 // ver: 3.2136.9-prerelease
@@ -81,5 +103,7 @@ declare namespace MusicKit {
     readonly isAuthorized: boolean;
     authorize: () => void;
     unauthorize: () => void;
+    setQueue: (options: { songs: string[] }) => Promise<void>;
+    play: () => Promise<void>;
   }
 }

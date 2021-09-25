@@ -7,6 +7,7 @@ import Capacitor
  */
 let resultKey = "result"
 
+@available(iOS 15.0, *)
 @objc(CapacitorAppleMusicPlugin)
 public class CapacitorAppleMusicPlugin: CAPPlugin {
     private let implementation = CapacitorAppleMusic()

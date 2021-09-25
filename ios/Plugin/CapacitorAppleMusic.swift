@@ -1,6 +1,7 @@
 import Foundation
 import MusicKit
 
+@available(iOS 15.0, *)
 @objc public class CapacitorAppleMusic: NSObject {
     @objc public func echo(_ value: String) -> String {
         return value
@@ -43,7 +44,7 @@ import MusicKit
         return result
     }
 
-    @objc public func play(_ call: CAPPluginCall) async -> Bool {
+    @objc public func play() async -> Bool {
         var result = false
         do {
             try await ApplicationMusicPlayer.shared.play()
@@ -51,5 +52,6 @@ import MusicKit
         } catch {
             print(error)
         }
+        return result
     }
 }

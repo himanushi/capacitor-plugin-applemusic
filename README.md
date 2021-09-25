@@ -13,11 +13,13 @@ npx cap sync
 
 <docgen-index>
 
-- [`echo(...)`](#echo)
-- [`configure(...)`](#configure)
-- [`isAuthorized()`](#isauthorized)
-- [`authorize()`](#authorize)
-- [`unauthorize()`](#unauthorize)
+* [`echo(...)`](#echo)
+* [`configure(...)`](#configure)
+* [`isAuthorized()`](#isauthorized)
+* [`authorize()`](#authorize)
+* [`unauthorize()`](#unauthorize)
+* [`setQueue(...)`](#setqueue)
+* [`play()`](#play)
 
 </docgen-index>
 
@@ -36,7 +38,8 @@ echo(options: { value: string; }) => any
 
 **Returns:** <code>any</code>
 
----
+--------------------
+
 
 ### configure(...)
 
@@ -50,7 +53,8 @@ configure(config: MusicKit.Config) => any
 
 **Returns:** <code>any</code>
 
----
+--------------------
+
 
 ### isAuthorized()
 
@@ -60,7 +64,8 @@ isAuthorized() => any
 
 **Returns:** <code>any</code>
 
----
+--------------------
+
 
 ### authorize()
 
@@ -70,7 +75,8 @@ authorize() => any
 
 **Returns:** <code>any</code>
 
----
+--------------------
+
 
 ### unauthorize()
 
@@ -80,6 +86,32 @@ unauthorize() => any
 
 **Returns:** <code>any</code>
 
----
+--------------------
+
+
+### setQueue(...)
+
+```typescript
+setQueue(options: { songId: string; }) => any
+```
+
+| Param         | Type                             |
+| ------------- | -------------------------------- |
+| **`options`** | <code>{ songId: string; }</code> |
+
+**Returns:** <code>any</code>
+
+--------------------
+
+
+### play()
+
+```typescript
+play() => any
+```
+
+**Returns:** <code>any</code>
+
+--------------------
 
 </docgen-api>

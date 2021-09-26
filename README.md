@@ -123,10 +123,10 @@ play() => any
 addListener(eventName: 'playbackStateDidChange', listenerFunc: PlaybackStateDidChangeListener) => Promise<PluginListenerHandle> & PluginListenerHandle
 ```
 
-| Param              | Type                                                         |
-| ------------------ | ------------------------------------------------------------ |
-| **`eventName`**    | <code>"playbackStateDidChange"</code>                        |
-| **`listenerFunc`** | <code>(state: { result: PlaybackStates; }) =&gt; void</code> |
+| Param              | Type                                                                                                                                                                     |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **`eventName`**    | <code>"playbackStateDidChange"</code>                                                                                                                                    |
+| **`listenerFunc`** | <code>(state: { result: "none" \| "loading" \| "playing" \| "paused" \| "stopped" \| "ended" \| "seeking" \| "waiting" \| "stalled" \| "completed"; }) =&gt; void</code> |
 
 **Returns:** <code>any</code>
 

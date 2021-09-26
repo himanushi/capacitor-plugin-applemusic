@@ -8,6 +8,6 @@ CAP_PLUGIN(CapacitorAppleMusicPlugin, "CapacitorAppleMusic",
     CAP_PLUGIN_METHOD(configure, CAPPluginReturnPromise);
     CAP_PLUGIN_METHOD(isAuthorized, CAPPluginReturnPromise);
     CAP_PLUGIN_METHOD(authorize, CAPPluginReturnPromise);
-    CAP_PLUGIN_METHOD(setQueue, CAPPluginReturnPromise);
+    CAP_PLUGIN_METHOD(setSong, CAPPluginReturnPromise);
     CAP_PLUGIN_METHOD(play, CAPPluginReturnPromise);
 )

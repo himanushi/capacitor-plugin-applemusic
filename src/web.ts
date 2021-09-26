@@ -6,6 +6,23 @@ import { WebPlugin, registerPlugin } from '@capacitor/core';
 export class CapacitorAppleMusicWeb
   extends WebPlugin
   implements CapacitorAppleMusicPlugin {
+  constructor() {
+    super();
+    MusicKit.getInstance().addEventListener(
+      'playbackStateDidChange',
+      this.playbackStateDidChange,
+    );
+  }
+
+  private playbackStateDidChange = (state: {
+    oldState: number;
+    state: number;
+  }) => {
+    const status = MusicKit.PlaybackStates[state.state];
+    const data = { result: status };
+    this.notifyListeners('playbackStateDidChange', data);
+  };
+
   async echo(options: { value: string }): Promise<{ value: string }> {
     console.log('ECHO', options);
     return options;
@@ -115,5 +132,22 @@ declare namespace MusicKit {
     unauthorize: () => void;
     setQueue: (options: { songs: string[] }) => Promise<void>;
     play: () => Promise<void>;
+    addEventListener: (
+      eventName: string,
+      callback: (state: { oldState: number; state: number }) => void,
+    ) => number;
+  }
+
+  enum PlaybackStates {
+    none,
+    loading,
+    playing,
+    paused,
+    stopped,
+    ended,
+    seeking,
+    waiting,
+    stalled,
+    completed,
   }
 }

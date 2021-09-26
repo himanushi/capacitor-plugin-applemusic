@@ -1,5 +1,6 @@
 import Foundation
 import Capacitor
+import MediaPlayer
 
 /**
  * Please read the Capacitor iOS Plugin Development Guide
@@ -11,6 +12,65 @@ let resultKey = "result"
 @objc(CapacitorAppleMusicPlugin)
 public class CapacitorAppleMusicPlugin: CAPPlugin {
     private let implementation = CapacitorAppleMusic()
+
+    override public func load() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(self.playbackStateDidChange(notification:)),
+            name: Notification.Name.MPMusicPlayerControllerPlaybackStateDidChange,
+            object: nil)
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
+    let player = MPMusicPlayerController.applicationMusicPlayer
+    var prevPlaybackState: MPMusicPlaybackState = .stopped
+    var started = false
+
+    @objc private func playbackStateDidChange(notification: NSNotification) {
+        var result = ""
+
+        if started &&
+           player.currentPlaybackTime == 0.0 &&
+           player.playbackState == .paused &&
+           prevPlaybackState == .paused
+        {
+            result = "complited"
+            prevPlaybackState = .stopped
+            started = false
+        }
+        else if player.playbackState == .playing &&
+                prevPlaybackState != .playing
+        {
+            result = "playing"
+            started = true
+        }
+        else if player.playbackState == .paused &&
+                prevPlaybackState != .paused
+        {
+            result = "paused"
+        }
+        else if player.playbackState == .stopped &&
+                prevPlaybackState != .stopped
+        {
+            result = "stopped"
+        }
+        else if player.playbackState == .interrupted &&
+                prevPlaybackState != .interrupted
+        {
+            result = "stopped"
+        }
+
+        if result != "" {
+            notifyListeners("playbackStateDidChange", data: [
+                "result": result
+            ])
+        }
+
+        prevPlaybackState = player.playbackState
+    }
 
     @objc func echo(_ call: CAPPluginCall) {
         let value = call.getString("value") ?? ""

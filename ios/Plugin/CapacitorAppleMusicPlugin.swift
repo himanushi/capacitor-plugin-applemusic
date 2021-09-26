@@ -37,7 +37,7 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
            player.playbackState == .paused &&
            prevPlaybackState == .paused
         {
-            result = "complited"
+            result = "completed"
             prevPlaybackState = .stopped
             started = false
         }
@@ -60,13 +60,11 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
         else if player.playbackState == .interrupted &&
                 prevPlaybackState != .interrupted
         {
-            result = "stopped"
+            result = "paused"
         }
 
         if result != "" {
-            notifyListeners("playbackStateDidChange", data: [
-                "result": result
-            ])
+            notifyListeners("playbackStateDidChange", data: ["result": result])
         }
 
         prevPlaybackState = player.playbackState

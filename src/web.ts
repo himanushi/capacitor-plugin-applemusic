@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 
+import type { PluginListenerHandle } from '@capacitor/core';
 import { WebPlugin, registerPlugin } from '@capacitor/core';
 
 export class CapacitorAppleMusicWeb
@@ -76,6 +77,11 @@ const CapacitorAppleMusic = registerPlugin<CapacitorAppleMusicPlugin>(
 
 export { CapacitorAppleMusic };
 
+export type PlaybackStates = 'playing' | 'paused' | 'stopped' | 'completed';
+export type PlaybackStateDidChangeListener = (state: {
+  result: PlaybackStates;
+}) => void;
+
 interface CapacitorAppleMusicPlugin {
   echo(options: { value: string }): Promise<{ value: string }>;
   configure(config: MusicKit.Config): Promise<{ result: boolean }>;
@@ -84,6 +90,10 @@ interface CapacitorAppleMusicPlugin {
   unauthorize(): Promise<{ result: boolean }>;
   setQueue(options: { songId: string }): Promise<{ result: boolean }>;
   play(): Promise<{ result: boolean }>;
+  addListener(
+    eventName: 'playbackStateDidChange',
+    listenerFunc: PlaybackStateDidChangeListener,
+  ): Promise<PluginListenerHandle> & PluginListenerHandle;
 }
 
 // ver: 3.2136.9-prerelease

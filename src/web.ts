@@ -6,14 +6,6 @@ import { WebPlugin, registerPlugin } from '@capacitor/core';
 export class CapacitorAppleMusicWeb
   extends WebPlugin
   implements CapacitorAppleMusicPlugin {
-  constructor() {
-    super();
-    MusicKit.getInstance().addEventListener(
-      'playbackStateDidChange',
-      this.playbackStateDidChange,
-    );
-  }
-
   private playbackStateDidChange = (state: {
     oldState: number;
     state: number;
@@ -31,7 +23,14 @@ export class CapacitorAppleMusicWeb
   async configure(config: MusicKit.Config): Promise<{ result: boolean }> {
     let configured = false;
     try {
-      configured = Boolean(await MusicKit.configure(config));
+      const musicKit = await MusicKit.configure(config);
+
+      musicKit.addEventListener(
+        'playbackStateDidChange',
+        this.playbackStateDidChange,
+      );
+
+      configured = true;
     } catch (error) {
       console.log(error);
     }

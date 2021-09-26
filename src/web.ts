@@ -93,7 +93,7 @@ const CapacitorAppleMusic = registerPlugin<CapacitorAppleMusicPlugin>(
 
 export { CapacitorAppleMusic };
 
-export type PlaybackStates = 'playing' | 'paused' | 'stopped' | 'completed';
+export type PlaybackStates = keyof typeof MusicKit.PlaybackStates;
 export type PlaybackStateDidChangeListener = (state: {
   result: PlaybackStates;
 }) => void;

@@ -62,6 +62,10 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
         {
             result = "paused"
         }
+        else if !started
+        {
+            result = "loading"
+        }
 
         if result != "" {
             notifyListeners("playbackStateDidChange", data: ["result": result])

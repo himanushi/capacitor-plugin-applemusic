@@ -24,10 +24,9 @@ import MusicKit
         return result
     }
 
-    @objc public func setQueue(_ songId: String) async -> Bool {
+    @objc public func setSong(_ songId: String) async -> Bool {
         var result = false
-        let request = MusicCatalogResourceRequest<MusicKit.Song>(
-            matching: \.id, equalTo: MusicItemID(songId))
+        let request = MusicCatalogResourceRequest<MusicKit.Song>(matching: \.id, equalTo: MusicItemID(songId))
         print("songId : \(songId)")
 
         do {

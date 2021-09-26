@@ -89,10 +89,10 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
         }
     }
 
-    @objc func setQueue(_ call: CAPPluginCall) {
+    @objc func setSong(_ call: CAPPluginCall) {
         let songId = call.getString("songId") ?? ""
         Task {
-            call.resolve([resultKey: await implementation.setQueue(songId)])
+            call.resolve([resultKey: await implementation.setSong(songId)])
         }
     }
 

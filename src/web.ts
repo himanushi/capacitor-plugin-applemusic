@@ -49,7 +49,7 @@ export class CapacitorAppleMusicWeb
     return { result: true };
   }
 
-  async setQueue(options: { songId: string }): Promise<{ result: boolean }> {
+  async setSong(options: { songId: string }): Promise<{ result: boolean }> {
     try {
       await MusicKit.getInstance().setQueue({ songs: [options.songId] });
     } catch (error) {
@@ -88,7 +88,7 @@ interface CapacitorAppleMusicPlugin {
   isAuthorized(): Promise<{ result: boolean }>;
   authorize(): Promise<{ result: boolean }>;
   unauthorize(): Promise<{ result: boolean }>;
-  setQueue(options: { songId: string }): Promise<{ result: boolean }>;
+  setSong(options: { songId: string }): Promise<{ result: boolean }>;
   play(): Promise<{ result: boolean }>;
   addListener(
     eventName: 'playbackStateDidChange',

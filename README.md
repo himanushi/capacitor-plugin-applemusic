@@ -20,6 +20,8 @@ npx cap sync
 * [`unauthorize()`](#unauthorize)
 * [`setQueue(...)`](#setqueue)
 * [`play()`](#play)
+* [`addListener(...)`](#addlistener)
+* [Interfaces](#interfaces)
 
 </docgen-index>
 
@@ -113,5 +115,31 @@ play() => any
 **Returns:** <code>any</code>
 
 --------------------
+
+
+### addListener(...)
+
+```typescript
+addListener(eventName: 'playbackStateDidChange', listenerFunc: PlaybackStateDidChangeListener) => Promise<PluginListenerHandle> & PluginListenerHandle
+```
+
+| Param              | Type                                                         |
+| ------------------ | ------------------------------------------------------------ |
+| **`eventName`**    | <code>"playbackStateDidChange"</code>                        |
+| **`listenerFunc`** | <code>(state: { result: PlaybackStates; }) =&gt; void</code> |
+
+**Returns:** <code>any</code>
+
+--------------------
+
+
+### Interfaces
+
+
+#### PluginListenerHandle
+
+| Prop         | Type                      |
+| ------------ | ------------------------- |
+| **`remove`** | <code>() =&gt; any</code> |
 
 </docgen-api>

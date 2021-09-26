@@ -18,7 +18,7 @@ npx cap sync
 * [`isAuthorized()`](#isauthorized)
 * [`authorize()`](#authorize)
 * [`unauthorize()`](#unauthorize)
-* [`setQueue(...)`](#setqueue)
+* [`setSong(...)`](#setsong)
 * [`play()`](#play)
 * [`addListener(...)`](#addlistener)
 * [Interfaces](#interfaces)
@@ -91,10 +91,10 @@ unauthorize() => any
 --------------------
 
 
-### setQueue(...)
+### setSong(...)
 
 ```typescript
-setQueue(options: { songId: string; }) => any
+setSong(options: { songId: string; }) => any
 ```
 
 | Param         | Type                             |

@@ -42,10 +42,6 @@ import MediaPlayer
         {
             result = "paused"
         }
-        else if !started
-        {
-            result = "loading"
-        }
 
         prevPlaybackState = player.playbackState
 

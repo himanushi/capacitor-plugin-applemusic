@@ -1,5 +1,6 @@
 import Foundation
 import MusicKit
+import StoreKit
 import MediaPlayer
 
 @available(iOS 15.0, *)
@@ -82,20 +83,48 @@ import MediaPlayer
             }
 
             playable = track.playParameters != nil
+
+            // reset
+            ApplicationMusicPlayer.shared.queue = []
+            player.setQueue(with: [])
+
             if(playable) {
+                // Apple Music
                 ApplicationMusicPlayer.shared.queue = [track]
                 result = true
             } else {
-                let query = MPMediaQuery.songs()
-                let filter = MPMediaPropertyPredicate(
-                    value: track.title,
-                    forProperty: MPMediaItemPropertyTitle,
-                    comparisonType: .equalTo)
-                query.filterPredicates = NSSet(object: filter) as? Set<MPMediaPredicate>
-                player.setQueue(with: query)
-                result = true
-            }
+                let term = track.title
+                                .replacingOccurrences(of: ",", with: " ")
+                                .addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)
+                let urlString = "https://api.music.apple.com/v1/me/library/search?term=\(term!)&types=library-songs&limit=25"
+                guard let url = URL(string: urlString) else { return false }
 
+                let data = try await MusicDataRequest(urlRequest: URLRequest(url: url)).response()
+                let response: LibrarySongsResults = try JSONDecoder().decode(LibrarySongsResults.self, from: data.data)
+
+                if let purchasedTrack = response.results?.librarySongs?.data?.filter({ song in
+                    return song.attributes?.playParams?.purchasedID == songId
+                }).first {
+                    // Play a song purchased from iTunes.
+                    let query = MPMediaQuery.songs()
+                    let trackTitleFilter = MPMediaPropertyPredicate(
+                        value: purchasedTrack.attributes?.name,
+                        forProperty: MPMediaItemPropertyTitle,
+                        comparisonType: .equalTo)
+                    let albumTitleFilter = MPMediaPropertyPredicate(
+                        value: purchasedTrack.attributes?.albumName,
+                        forProperty: MPMediaItemPropertyAlbumTitle,
+                        comparisonType: .equalTo)
+                    let filterPredicates: Set<MPMediaPredicate> = [trackTitleFilter, albumTitleFilter]
+                    query.filterPredicates = filterPredicates
+                    if (query.items?.count ?? 0) > 0 {
+                        player.setQueue(with: query)
+                        result = true
+                    }
+                } else {
+                    // Play the preview
+                }
+            }
         } catch {
             print(error)
         }
@@ -135,5 +164,75 @@ import MediaPlayer
     @objc public func seekToTime(_ playbackTime: Double) async -> Bool {
         ApplicationMusicPlayer.shared.playbackTime = playbackTime
         return true
+    }
+
+    // ref: https://app.quicktype.io/
+//    {
+//         "results": {
+//             "library-songs": {
+//                 "data": [{
+//                     "attributes": {
+//                         "name": "D8: バトル〜Adel",
+//                         "albumName": "DESTINY 8 - SaGa Band Arrangement Album Vol.2",
+//                         "playParams": {
+//                            "id": "i.xxxxxxxxxxxxxx",
+//                            "isLibrary": true,
+//                            "kind": "song",
+//                            "purchasedId": "1577159951",
+//                            "reporting": false,
+//                            "catalogId": "1175972539"
+//                         }
+//                     },
+//                     "id": ""
+//                 }]
+//             }
+//         }
+//    }
+
+    // MARK: - LibrarySongsResults
+    struct LibrarySongsResults: Codable {
+        let results: Results?
+    }
+
+    // MARK: - Results
+    struct Results: Codable {
+        let librarySongs: LibrarySongs?
+
+        enum CodingKeys: String, CodingKey {
+            case librarySongs = "library-songs"
+        }
+    }
+
+    // MARK: - LibrarySongs
+    struct LibrarySongs: Codable {
+        let data: [Datum]?
+    }
+
+    // MARK: - Datum
+    struct Datum: Codable {
+        let attributes: Attributes?
+        let id: String?
+    }
+
+    // MARK: - Attributes
+    struct Attributes: Codable {
+        let name, albumName: String?
+        let playParams: PlayParams?
+    }
+
+    // MARK: - PlayParams
+    struct PlayParams: Codable {
+        let id: String?
+        let isLibrary: Bool?
+        let kind, purchasedID: String?
+        let reporting: Bool?
+        let catalogID: String?
+
+        enum CodingKeys: String, CodingKey {
+            case id, isLibrary, kind
+            case purchasedID = "purchasedId"
+            case reporting
+            case catalogID = "catalogId"
+        }
     }
 }

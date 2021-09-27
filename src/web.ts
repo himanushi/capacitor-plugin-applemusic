@@ -20,10 +20,12 @@ export class CapacitorAppleMusicWeb
     return options;
   }
 
-  async configure(config: MusicKit.Config): Promise<{ result: boolean }> {
+  async configure(options: {
+    config: MusicKit.Config;
+  }): Promise<{ result: boolean }> {
     let configured = false;
     try {
-      const musicKit = await MusicKit.configure(config);
+      const musicKit = await MusicKit.configure(options.config);
 
       musicKit.addEventListener(
         'playbackStateDidChange',
@@ -75,12 +77,53 @@ export class CapacitorAppleMusicWeb
   }
 
   async play(): Promise<{ result: boolean }> {
+    let result = false;
     try {
       await MusicKit.getInstance().play();
+      result = true;
     } catch (error) {
       console.log(error);
     }
-    return { result: true };
+    return { result };
+  }
+
+  async stop(): Promise<{ result: boolean }> {
+    let result = false;
+    try {
+      await MusicKit.getInstance().stop();
+      result = true;
+    } catch (error) {
+      console.log(error);
+    }
+    return { result };
+  }
+
+  async pause(): Promise<{ result: boolean }> {
+    let result = false;
+    try {
+      await MusicKit.getInstance().pause();
+      result = true;
+    } catch (error) {
+      console.log(error);
+    }
+    return { result };
+  }
+
+  async currentPlaybackTime(): Promise<{ result: number }> {
+    return { result: MusicKit.getInstance().currentPlaybackTime };
+  }
+
+  async seekToTime(options: {
+    playbackTime: number;
+  }): Promise<{ result: boolean }> {
+    let result = false;
+    try {
+      MusicKit.getInstance().seekToTime(options.playbackTime);
+      result = true;
+    } catch (error) {
+      console.log(error);
+    }
+    return { result };
   }
 }
 
@@ -100,12 +143,16 @@ export type PlaybackStateDidChangeListener = (state: {
 
 interface CapacitorAppleMusicPlugin {
   echo(options: { value: string }): Promise<{ value: string }>;
-  configure(config: MusicKit.Config): Promise<{ result: boolean }>;
+  configure(options: { config: MusicKit.Config }): Promise<{ result: boolean }>;
   isAuthorized(): Promise<{ result: boolean }>;
   authorize(): Promise<{ result: boolean }>;
   unauthorize(): Promise<{ result: boolean }>;
   setSong(options: { songId: string }): Promise<{ result: boolean }>;
   play(): Promise<{ result: boolean }>;
+  stop(): Promise<{ result: boolean }>;
+  pause(): Promise<{ result: boolean }>;
+  currentPlaybackTime(): Promise<{ result: number }>;
+  seekToTime(options: { playbackTime: number }): Promise<{ result: boolean }>;
   addListener(
     eventName: 'playbackStateDidChange',
     listenerFunc: PlaybackStateDidChangeListener,
@@ -126,11 +173,15 @@ declare namespace MusicKit {
 
   interface MusicKitInstance {
     storefrontId: string;
+    currentPlaybackTime: number;
     readonly isAuthorized: boolean;
     authorize: () => void;
     unauthorize: () => void;
     setQueue: (options: { songs: string[] }) => Promise<void>;
     play: () => Promise<void>;
+    stop: () => Promise<void>;
+    pause: () => Promise<void>;
+    seekToTime: (playbackTime: number) => Promise<void>;
     addEventListener: (
       eventName: string,
       callback: (state: { oldState: number; state: number }) => void,

@@ -69,18 +69,33 @@ import MediaPlayer
         return result
     }
 
+    var playable = false
     @objc public func setSong(_ songId: String) async -> Bool {
         var result = false
         let request = MusicCatalogResourceRequest<MusicKit.Song>(matching: \.id, equalTo: MusicItemID(songId))
-        print("songId : \(songId)")
 
         do {
             let response = try await request.response()
-            if let track = response.items.first {
-                print("name : \(track.title)")
-                ApplicationMusicPlayer.shared.queue = [track]
+
+            guard let track = response.items.first else {
+                return false
             }
-            result = true
+
+            playable = track.playParameters != nil
+            if(playable) {
+                ApplicationMusicPlayer.shared.queue = [track]
+                result = true
+            } else {
+                let query = MPMediaQuery.songs()
+                let filter = MPMediaPropertyPredicate(
+                    value: track.title,
+                    forProperty: MPMediaItemPropertyTitle,
+                    comparisonType: .equalTo)
+                query.filterPredicates = NSSet(object: filter) as? Set<MPMediaPredicate>
+                player.setQueue(with: query)
+                result = true
+            }
+
         } catch {
             print(error)
         }
@@ -91,7 +106,11 @@ import MediaPlayer
     @objc public func play() async -> Bool {
         var result = false
         do {
-            try await ApplicationMusicPlayer.shared.play()
+            if(playable) {
+                try await ApplicationMusicPlayer.shared.play()
+            } else {
+                player.play()
+            }
             result = true
         } catch {
             print(error)

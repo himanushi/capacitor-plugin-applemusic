@@ -20,6 +20,10 @@ npx cap sync
 * [`unauthorize()`](#unauthorize)
 * [`setSong(...)`](#setsong)
 * [`play()`](#play)
+* [`stop()`](#stop)
+* [`pause()`](#pause)
+* [`currentPlaybackTime()`](#currentplaybacktime)
+* [`seekToTime(...)`](#seektotime)
 * [`addListener(...)`](#addlistener)
 * [Interfaces](#interfaces)
 
@@ -46,12 +50,12 @@ echo(options: { value: string; }) => any
 ### configure(...)
 
 ```typescript
-configure(config: MusicKit.Config) => any
+configure(options: { config: MusicKit.Config; }) => any
 ```
 
-| Param        | Type                |
-| ------------ | ------------------- |
-| **`config`** | <code>Config</code> |
+| Param         | Type                             |
+| ------------- | -------------------------------- |
+| **`options`** | <code>{ config: Config; }</code> |
 
 **Returns:** <code>any</code>
 
@@ -111,6 +115,54 @@ setSong(options: { songId: string; }) => any
 ```typescript
 play() => any
 ```
+
+**Returns:** <code>any</code>
+
+--------------------
+
+
+### stop()
+
+```typescript
+stop() => any
+```
+
+**Returns:** <code>any</code>
+
+--------------------
+
+
+### pause()
+
+```typescript
+pause() => any
+```
+
+**Returns:** <code>any</code>
+
+--------------------
+
+
+### currentPlaybackTime()
+
+```typescript
+currentPlaybackTime() => any
+```
+
+**Returns:** <code>any</code>
+
+--------------------
+
+
+### seekToTime(...)
+
+```typescript
+seekToTime(options: { playbackTime: number; }) => any
+```
+
+| Param         | Type                                   |
+| ------------- | -------------------------------------- |
+| **`options`** | <code>{ playbackTime: number; }</code> |
 
 **Returns:** <code>any</code>
 

@@ -25,49 +25,11 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
         NotificationCenter.default.removeObserver(self)
     }
 
-    let player = MPMusicPlayerController.applicationMusicPlayer
-    var prevPlaybackState: MPMusicPlaybackState = .stopped
-    var started = false
-
     @objc private func playbackStateDidChange(notification: NSNotification) {
-        var result = ""
-
-        if started &&
-           player.currentPlaybackTime == 0.0 &&
-           player.playbackState == .paused &&
-           prevPlaybackState == .paused
-        {
-            result = "completed"
-            prevPlaybackState = .stopped
-            started = false
-        }
-        else if player.playbackState == .playing &&
-                prevPlaybackState != .playing
-        {
-            result = "playing"
-            started = true
-        }
-        else if player.playbackState == .paused &&
-                prevPlaybackState != .paused
-        {
-            result = "paused"
-        }
-        else if player.playbackState == .stopped &&
-                prevPlaybackState != .stopped
-        {
-            result = "stopped"
-        }
-        else if player.playbackState == .interrupted &&
-                prevPlaybackState != .interrupted
-        {
-            result = "paused"
-        }
-
+        let result = implementation.playbackStateDidChange()
         if result != "" {
             notifyListeners("playbackStateDidChange", data: ["result": result])
         }
-
-        prevPlaybackState = player.playbackState
     }
 
     @objc func echo(_ call: CAPPluginCall) {
@@ -99,6 +61,31 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
     @objc func play(_ call: CAPPluginCall) {
         Task {
             call.resolve([resultKey: await implementation.play()])
+        }
+    }
+
+    @objc func stop(_ call: CAPPluginCall) {
+        Task {
+            call.resolve([resultKey: await implementation.stop()])
+        }
+    }
+
+    @objc func pause(_ call: CAPPluginCall) {
+        Task {
+            call.resolve([resultKey: await implementation.pause()])
+        }
+    }
+
+    @objc func currentPlaybackTime(_ call: CAPPluginCall) {
+        Task {
+            call.resolve([resultKey: await implementation.currentPlaybackTime()])
+        }
+    }
+
+    @objc func seekToTime(_ call: CAPPluginCall) {
+        let playbackTime = call.getDouble("playbackTime") ?? 0.0
+        Task {
+            call.resolve([resultKey: await implementation.seekToTime(playbackTime)])
         }
     }
 }

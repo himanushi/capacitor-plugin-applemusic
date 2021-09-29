@@ -108,7 +108,6 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
         }
     }
 
-
     @objc func play(_ call: CAPPluginCall) {
         Task {
             var result = false
@@ -227,10 +226,10 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
                                     player.setQueue(with: query)
                                     result = true
                                 }
-                            } else if let url = track.previewAssets?.first?.url {
-                                print("🎵 ------ preview ---------", url)
+                            } else if let previewUrl = track.previewAssets?.first?.url {
+                                print("🎵 ------ preview ---------", previewUrl)
                                 // Play the preview
-                                let playerItem = AVPlayerItem(url: url )
+                                let playerItem = AVPlayerItem(url: previewUrl)
                                 previewPlayer = AVPlayer(playerItem: playerItem)
                                 result = true
                             }
@@ -258,7 +257,6 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
             previewPlayer = nil
         }
     }
-
 
     // ref: https://app.quicktype.io/
     //    {

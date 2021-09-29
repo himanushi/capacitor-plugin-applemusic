@@ -231,6 +231,7 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
                                 // Play the preview
                                 let playerItem = AVPlayerItem(url: previewUrl)
                                 previewPlayer = AVPlayer(playerItem: playerItem)
+                                previewPlayer!.addObserver(self, forKeyPath: "rate", options: [], context: nil)
                                 result = true
                             }
                         }
@@ -252,9 +253,26 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
         player.stop()
         player.setQueue(with: [])
 
-        if (previewPlayer) != nil {
+        if previewPlayer != nil {
             await previewPlayer?.pause()
             previewPlayer = nil
+        }
+    }
+
+    public override func observeValue(
+        forKeyPath keyPath: String?,
+        of object: Any?,
+        change: [NSKeyValueChangeKey : Any]?,
+        context: UnsafeMutableRawPointer?) {
+
+        if keyPath == "rate", let player = object as? AVPlayer, let item = player.currentItem {
+            if player.rate == 1 {
+                notifyListeners("playbackStateDidChange", data: ["result": "playing"])
+            } else if item.duration == player.currentTime() {
+                notifyListeners("playbackStateDidChange", data: ["result": "completed"])
+            } else {
+                notifyListeners("playbackStateDidChange", data: ["result": "paused"])
+            }
         }
     }
 

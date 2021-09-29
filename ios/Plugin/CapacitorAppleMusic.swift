@@ -7,6 +7,7 @@ import MediaPlayer
 @objc public class CapacitorAppleMusic: NSObject {
 
     let player = MPMusicPlayerController.applicationMusicPlayer
+    var previewPlayer: AVPlayer?
 
     var prevPlaybackState: MPMusicPlaybackState = .stopped
     var started = false
@@ -73,6 +74,9 @@ import MediaPlayer
     var playable = false
     @objc public func setSong(_ songId: String) async -> Bool {
         var result = false
+
+        await reset()
+
         let request = MusicCatalogResourceRequest<MusicKit.Song>(matching: \.id, equalTo: MusicItemID(songId))
 
         do {
@@ -84,11 +88,8 @@ import MediaPlayer
 
             playable = track.playParameters != nil
 
-            // reset
-            ApplicationMusicPlayer.shared.queue = []
-            player.setQueue(with: [])
-
             if(playable) {
+                print("🎵 ------ Apple Music ---------")
                 // Apple Music
                 ApplicationMusicPlayer.shared.queue = [track]
                 result = true
@@ -97,6 +98,7 @@ import MediaPlayer
                                 .replacingOccurrences(of: ",", with: " ")
                                 .addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)
                 let urlString = "https://api.music.apple.com/v1/me/library/search?term=\(term!)&types=library-songs&limit=25"
+
                 guard let url = URL(string: urlString) else { return false }
 
                 let data = try await MusicDataRequest(urlRequest: URLRequest(url: url)).response()
@@ -105,6 +107,7 @@ import MediaPlayer
                 if let purchasedTrack = response.results?.librarySongs?.data?.filter({ song in
                     return song.attributes?.playParams?.purchasedID == songId
                 }).first {
+                    print("🎵 ------ iTunes ---------")
                     // Play a song purchased from iTunes.
                     let query = MPMediaQuery.songs()
                     let trackTitleFilter = MPMediaPropertyPredicate(
@@ -121,8 +124,12 @@ import MediaPlayer
                         player.setQueue(with: query)
                         result = true
                     }
-                } else {
+                } else if let url = track.previewAssets?.first?.url {
+                    print("🎵 ------ preview ---------", url)
                     // Play the preview
+                    let playerItem = AVPlayerItem(url: url )
+                    previewPlayer = AVPlayer(playerItem: playerItem)
+                    result = true
                 }
             }
         } catch {
@@ -132,10 +139,25 @@ import MediaPlayer
         return result
     }
 
+    private func reset() async -> Void {
+        ApplicationMusicPlayer.shared.stop()
+        ApplicationMusicPlayer.shared.queue = []
+
+        player.stop()
+        player.setQueue(with: [])
+
+        if (previewPlayer) != nil {
+            await previewPlayer?.pause()
+            previewPlayer = nil
+        }
+    }
+
     @objc public func play() async -> Bool {
         var result = false
         do {
-            if(playable) {
+            if (previewPlayer?.currentItem) != nil {
+                await previewPlayer?.play()
+            } else if(playable) {
                 try await ApplicationMusicPlayer.shared.play()
             } else {
                 player.play()

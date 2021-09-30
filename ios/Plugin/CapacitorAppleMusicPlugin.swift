@@ -149,15 +149,27 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
         }
     }
 
+    @objc func currentPlaybackDuration(_ call: CAPPluginCall) {
+        Task {
+            var duration = 0.0
+            if let currentItem = previewPlayer?.currentItem {
+                duration = Double(CMTimeGetSeconds(currentItem.duration))
+            } else if let song = ApplicationMusicPlayer.shared.queue.entries.first?.transientItem as? Song {
+                duration = song.duration ?? 0.0
+            }
+            call.resolve([resultKey: duration])
+        }
+    }
+
     @objc func currentPlaybackTime(_ call: CAPPluginCall) {
         Task {
-            var currentPlaybackTime = 0.0
+            var playbackTime = 0.0
             if let currentTime = previewPlayer?.currentTime() {
-                currentPlaybackTime = Double(CMTimeGetSeconds(currentTime))
+                playbackTime = Double(CMTimeGetSeconds(currentTime))
             } else {
-                currentPlaybackTime = ApplicationMusicPlayer.shared.playbackTime
+                playbackTime = ApplicationMusicPlayer.shared.playbackTime
             }
-            call.resolve([resultKey: currentPlaybackTime])
+            call.resolve([resultKey: playbackTime])
         }
     }
 

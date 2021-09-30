@@ -109,6 +109,10 @@ export class CapacitorAppleMusicWeb
     return { result };
   }
 
+  async currentPlaybackDuration(): Promise<{ result: number }> {
+    return { result: MusicKit.getInstance().currentPlaybackDuration };
+  }
+
   async currentPlaybackTime(): Promise<{ result: number }> {
     return { result: MusicKit.getInstance().currentPlaybackTime };
   }
@@ -151,6 +155,7 @@ interface CapacitorAppleMusicPlugin {
   play(): Promise<{ result: boolean }>;
   stop(): Promise<{ result: boolean }>;
   pause(): Promise<{ result: boolean }>;
+  currentPlaybackDuration(): Promise<{ result: number }>;
   currentPlaybackTime(): Promise<{ result: number }>;
   seekToTime(options: { playbackTime: number }): Promise<{ result: boolean }>;
   addListener(
@@ -174,6 +179,7 @@ declare namespace MusicKit {
   interface MusicKitInstance {
     storefrontId: string;
     currentPlaybackTime: number;
+    currentPlaybackDuration: number;
     readonly isAuthorized: boolean;
     authorize: () => void;
     unauthorize: () => void;

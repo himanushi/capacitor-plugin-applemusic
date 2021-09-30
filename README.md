@@ -22,6 +22,7 @@ npx cap sync
 * [`play()`](#play)
 * [`stop()`](#stop)
 * [`pause()`](#pause)
+* [`currentPlaybackDuration()`](#currentplaybackduration)
 * [`currentPlaybackTime()`](#currentplaybacktime)
 * [`seekToTime(...)`](#seektotime)
 * [`addListener(...)`](#addlistener)
@@ -136,6 +137,17 @@ stop() => any
 
 ```typescript
 pause() => any
+```
+
+**Returns:** <code>any</code>
+
+--------------------
+
+
+### currentPlaybackDuration()
+
+```typescript
+currentPlaybackDuration() => any
 ```
 
 **Returns:** <code>any</code>

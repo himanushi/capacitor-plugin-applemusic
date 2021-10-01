@@ -42,8 +42,10 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
     @objc private func playbackStateDidChange(notification: NSNotification) {
         var result = ""
 
+        let currentDuration = MPMusicPlayerController.applicationMusicPlayer.nowPlayingItem?.playbackDuration ?? 0.0
+
         if started &&
-           player.currentPlaybackTime == 0.0 &&
+           (player.currentPlaybackTime == 0.0 || player.currentPlaybackTime >= currentDuration) &&
            player.playbackState == .paused &&
            prevPlaybackState == .paused
         {
@@ -154,8 +156,8 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
             var duration = 0.0
             if let currentItem = previewPlayer?.currentItem {
                 duration = Double(CMTimeGetSeconds(currentItem.duration))
-            } else if let song = ApplicationMusicPlayer.shared.queue.entries.first?.transientItem as? Song {
-                duration = song.duration ?? 0.0
+            } else if let playbackDuration = MPMusicPlayerController.applicationMusicPlayer.nowPlayingItem?.playbackDuration {
+                duration = playbackDuration
             }
             call.resolve([resultKey: duration])
         }

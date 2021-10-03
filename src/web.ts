@@ -69,7 +69,42 @@ export class CapacitorAppleMusicWeb
 
   async setSong(options: { songId: string }): Promise<{ result: boolean }> {
     try {
-      await MusicKit.getInstance().setQueue({ songs: [options.songId] });
+      const catalogResult = await MusicKit.getInstance().api.music(
+        `v1/catalog/jp/songs/${options.songId}`,
+      );
+
+      if (!('data' in catalogResult.data)) return { result: false };
+
+      const track = catalogResult.data.data[0];
+      if (!track) return { result: false };
+
+      const playable = Boolean(track.attributes.playParams);
+      if (playable) {
+        console.log('🎵 ------ Apple Music ---------');
+        await MusicKit.getInstance().setQueue({ songs: [options.songId] });
+      } else {
+        const term = track.attributes.name.replaceAll(',', ' ');
+        const libraryResult = await MusicKit.getInstance().api.music(
+          'v1/me/library/search',
+          {
+            term,
+            types: ['library-songs'],
+            limit: 25,
+          },
+        );
+
+        if (!('results' in libraryResult.data)) return { result: false };
+
+        const tracks = libraryResult.data.results['library-songs']?.data || [];
+        const purchasedTrack = tracks.find(
+          trk => trk.attributes.playParams.purchasedId === options.songId,
+        );
+
+        if (purchasedTrack) {
+          console.log('🎵 ------ iTunes ---------');
+          await MusicKit.getInstance().setQueue({ songs: [purchasedTrack.id] });
+        }
+      }
     } catch (error) {
       console.log(error);
     }
@@ -177,6 +212,7 @@ declare namespace MusicKit {
   function getInstance(): MusicKitInstance;
 
   interface MusicKitInstance {
+    api: AppleMusicAPI;
     storefrontId: string;
     currentPlaybackTime: number;
     currentPlaybackDuration: number;
@@ -192,6 +228,57 @@ declare namespace MusicKit {
       eventName: string,
       callback: (state: { oldState: number; state: number }) => void,
     ) => number;
+  }
+
+  interface AppleMusicAPI {
+    music(
+      endpoint: string,
+      params?: Record<string, any>,
+    ): Promise<APIResultCatalogSongs | APIResultLibrarySongs>;
+  }
+
+  interface APIResultCatalogSongs {
+    data: {
+      data: CatalogSong[];
+    };
+  }
+
+  interface CatalogSong {
+    attributes: CatalogSongAttributes;
+  }
+
+  interface CatalogSongAttributes {
+    name: string;
+    playParams?: {
+      id: string;
+    };
+    previews: CatalogSongPreview[];
+  }
+
+  interface CatalogSongPreview {
+    url: string;
+  }
+
+  interface APIResultLibrarySongs {
+    data: {
+      results: {
+        'library-songs'?: {
+          data: APIResultData[];
+        };
+      };
+    };
+  }
+
+  interface APIResultData {
+    id: string;
+    type: string;
+    href: string;
+    attributes: {
+      name: string;
+      playParams: {
+        purchasedId?: string;
+      };
+    };
   }
 
   enum PlaybackStates {

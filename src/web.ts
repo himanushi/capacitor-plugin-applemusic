@@ -72,6 +72,13 @@ export class CapacitorAppleMusicWeb
   defaultVolume = 1.0;
   fadeoutId: NodeJS.Timeout | undefined;
 
+  resetFadeoutId(): void {
+    if (this.fadeoutId !== undefined) {
+      clearTimeout(this.fadeoutId);
+      this.fadeoutId = undefined;
+    }
+  }
+
   async resetMusicKit(): Promise<void> {
     MusicKit.getInstance().volume = this.defaultVolume;
     await MusicKit.getInstance().stop();
@@ -79,10 +86,7 @@ export class CapacitorAppleMusicWeb
   }
 
   async resetPreviewPlayer(): Promise<void> {
-    if (this.fadeoutId !== undefined) {
-      clearTimeout(this.fadeoutId);
-      this.fadeoutId = undefined;
-    }
+    this.resetFadeoutId();
     if (this.player) {
       this.player.stop();
       this.player.off('play');
@@ -144,7 +148,7 @@ export class CapacitorAppleMusicWeb
 
         const tracks = libraryResult.data.results['library-songs']?.data || [];
         const purchasedTrack = tracks.find(
-          trk => trk.attributes.playParams.purchasedId === options.songId,
+          trk => trk.attributes.playParams?.purchasedId === options.songId,
         );
         const previewUrl = track.attributes.previews[0]?.url;
 
@@ -207,20 +211,20 @@ export class CapacitorAppleMusicWeb
       this.notifyListeners('playbackStateDidChange', { result: 'playing' });
     });
     this.player.on('pause', () => {
+      this.resetFadeoutId();
       this.notifyListeners('playbackStateDidChange', { result: 'paused' });
     });
     this.player.on('end', () => {
+      this.resetFadeoutId();
       this.notifyListeners('playbackStateDidChange', { result: 'completed' });
     });
     this.player.on('stop', () => {
+      this.resetFadeoutId();
       this.notifyListeners('playbackStateDidChange', { result: 'stopped' });
     });
     this.player.on('seek', () => {
-      if (this.fadeoutId !== undefined) {
-        clearTimeout(this.fadeoutId);
-        this.fadeoutId = undefined;
-      }
-      this.notifyListeners('playbackStateDidChange', { result: 'paused' });
+      this.resetFadeoutId();
+      fadeOut();
     });
   }
 

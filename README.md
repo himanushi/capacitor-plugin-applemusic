@@ -36,14 +36,14 @@ npx cap sync
 ### echo(...)
 
 ```typescript
-echo(options: { value: string; }) => any
+echo(options: { value: string; }) => Promise<{ value: string; }>
 ```
 
 | Param         | Type                            |
 | ------------- | ------------------------------- |
 | **`options`** | <code>{ value: string; }</code> |
 
-**Returns:** <code>any</code>
+**Returns:** <code>Promise&lt;{ value: string; }&gt;</code>
 
 --------------------
 
@@ -51,14 +51,14 @@ echo(options: { value: string; }) => any
 ### configure(...)
 
 ```typescript
-configure(options: { config: MusicKit.Config; }) => any
+configure(options: { config: MusicKit.Config; }) => Promise<{ result: boolean; }>
 ```
 
 | Param         | Type                             |
 | ------------- | -------------------------------- |
 | **`options`** | <code>{ config: Config; }</code> |
 
-**Returns:** <code>any</code>
+**Returns:** <code>Promise&lt;{ result: boolean; }&gt;</code>
 
 --------------------
 
@@ -66,10 +66,10 @@ configure(options: { config: MusicKit.Config; }) => any
 ### isAuthorized()
 
 ```typescript
-isAuthorized() => any
+isAuthorized() => Promise<{ result: boolean; }>
 ```
 
-**Returns:** <code>any</code>
+**Returns:** <code>Promise&lt;{ result: boolean; }&gt;</code>
 
 --------------------
 
@@ -77,10 +77,10 @@ isAuthorized() => any
 ### authorize()
 
 ```typescript
-authorize() => any
+authorize() => Promise<{ result: boolean; }>
 ```
 
-**Returns:** <code>any</code>
+**Returns:** <code>Promise&lt;{ result: boolean; }&gt;</code>
 
 --------------------
 
@@ -88,10 +88,10 @@ authorize() => any
 ### unauthorize()
 
 ```typescript
-unauthorize() => any
+unauthorize() => Promise<{ result: boolean; }>
 ```
 
-**Returns:** <code>any</code>
+**Returns:** <code>Promise&lt;{ result: boolean; }&gt;</code>
 
 --------------------
 
@@ -99,14 +99,14 @@ unauthorize() => any
 ### setSong(...)
 
 ```typescript
-setSong(options: { songId: string; }) => any
+setSong(options: { songId: string; }) => Promise<{ result: boolean; }>
 ```
 
 | Param         | Type                             |
 | ------------- | -------------------------------- |
 | **`options`** | <code>{ songId: string; }</code> |
 
-**Returns:** <code>any</code>
+**Returns:** <code>Promise&lt;{ result: boolean; }&gt;</code>
 
 --------------------
 
@@ -114,10 +114,10 @@ setSong(options: { songId: string; }) => any
 ### play()
 
 ```typescript
-play() => any
+play() => Promise<{ result: boolean; }>
 ```
 
-**Returns:** <code>any</code>
+**Returns:** <code>Promise&lt;{ result: boolean; }&gt;</code>
 
 --------------------
 
@@ -125,10 +125,10 @@ play() => any
 ### stop()
 
 ```typescript
-stop() => any
+stop() => Promise<{ result: boolean; }>
 ```
 
-**Returns:** <code>any</code>
+**Returns:** <code>Promise&lt;{ result: boolean; }&gt;</code>
 
 --------------------
 
@@ -136,10 +136,10 @@ stop() => any
 ### pause()
 
 ```typescript
-pause() => any
+pause() => Promise<{ result: boolean; }>
 ```
 
-**Returns:** <code>any</code>
+**Returns:** <code>Promise&lt;{ result: boolean; }&gt;</code>
 
 --------------------
 
@@ -147,10 +147,10 @@ pause() => any
 ### currentPlaybackDuration()
 
 ```typescript
-currentPlaybackDuration() => any
+currentPlaybackDuration() => Promise<{ result: number; }>
 ```
 
-**Returns:** <code>any</code>
+**Returns:** <code>Promise&lt;{ result: number; }&gt;</code>
 
 --------------------
 
@@ -158,10 +158,10 @@ currentPlaybackDuration() => any
 ### currentPlaybackTime()
 
 ```typescript
-currentPlaybackTime() => any
+currentPlaybackTime() => Promise<{ result: number; }>
 ```
 
-**Returns:** <code>any</code>
+**Returns:** <code>Promise&lt;{ result: number; }&gt;</code>
 
 --------------------
 
@@ -169,14 +169,14 @@ currentPlaybackTime() => any
 ### seekToTime(...)
 
 ```typescript
-seekToTime(options: { playbackTime: number; }) => any
+seekToTime(options: { playbackTime: number; }) => Promise<{ result: boolean; }>
 ```
 
 | Param         | Type                                   |
 | ------------- | -------------------------------------- |
 | **`options`** | <code>{ playbackTime: number; }</code> |
 
-**Returns:** <code>any</code>
+**Returns:** <code>Promise&lt;{ result: boolean; }&gt;</code>
 
 --------------------
 
@@ -192,7 +192,7 @@ addListener(eventName: 'playbackStateDidChange', listenerFunc: PlaybackStateDidC
 | **`eventName`**    | <code>"playbackStateDidChange"</code>                                                                                                                                    |
 | **`listenerFunc`** | <code>(state: { result: "none" \| "loading" \| "playing" \| "paused" \| "stopped" \| "ended" \| "seeking" \| "waiting" \| "stalled" \| "completed"; }) =&gt; void</code> |
 
-**Returns:** <code>any</code>
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt; & <a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
 --------------------
 
@@ -202,8 +202,8 @@ addListener(eventName: 'playbackStateDidChange', listenerFunc: PlaybackStateDidC
 
 #### PluginListenerHandle
 
-| Prop         | Type                      |
-| ------------ | ------------------------- |
-| **`remove`** | <code>() =&gt; any</code> |
+| Prop         | Type                                      |
+| ------------ | ----------------------------------------- |
+| **`remove`** | <code>() =&gt; Promise&lt;void&gt;</code> |
 
 </docgen-api>

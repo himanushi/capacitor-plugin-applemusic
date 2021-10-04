@@ -25,6 +25,7 @@ npx cap sync
 * [`currentPlaybackDuration()`](#currentplaybackduration)
 * [`currentPlaybackTime()`](#currentplaybacktime)
 * [`seekToTime(...)`](#seektotime)
+* [`setVolume(...)`](#setvolume)
 * [`addListener(...)`](#addlistener)
 * [Interfaces](#interfaces)
 
@@ -175,6 +176,21 @@ seekToTime(options: { playbackTime: number; }) => Promise<{ result: boolean; }>
 | Param         | Type                                   |
 | ------------- | -------------------------------------- |
 | **`options`** | <code>{ playbackTime: number; }</code> |
+
+**Returns:** <code>Promise&lt;{ result: boolean; }&gt;</code>
+
+--------------------
+
+
+### setVolume(...)
+
+```typescript
+setVolume(options: { volume: number; }) => Promise<{ result: boolean; }>
+```
+
+| Param         | Type                             |
+| ------------- | -------------------------------- |
+| **`options`** | <code>{ volume: number; }</code> |
 
 **Returns:** <code>Promise&lt;{ result: boolean; }&gt;</code>
 

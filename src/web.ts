@@ -69,8 +69,10 @@ export class CapacitorAppleMusicWeb
   }
 
   player: Howl | undefined;
+  defaultVolume = 1.0;
 
   async reset(): Promise<void> {
+    MusicKit.getInstance().volume = this.defaultVolume;
     await MusicKit.getInstance().stop();
     await MusicKit.getInstance().queue.reset();
     if (this.player) {
@@ -135,7 +137,7 @@ export class CapacitorAppleMusicWeb
       html5: true,
       preload: false,
       src: previewUrl,
-      volume: 0,
+      volume: this.defaultVolume,
     });
   }
 
@@ -152,6 +154,11 @@ export class CapacitorAppleMusicWeb
       console.log(error);
     }
     return { result };
+  }
+
+  async setVolume(options: { volume: number }): Promise<{ result: boolean }> {
+    this.defaultVolume = options.volume;
+    return { result: true };
   }
 
   async stop(): Promise<{ result: boolean }> {
@@ -250,6 +257,7 @@ interface CapacitorAppleMusicPlugin {
   currentPlaybackDuration(): Promise<{ result: number }>;
   currentPlaybackTime(): Promise<{ result: number }>;
   seekToTime(options: { playbackTime: number }): Promise<{ result: boolean }>;
+  setVolume(options: { volume: number }): Promise<{ result: boolean }>;
   addListener(
     eventName: 'playbackStateDidChange',
     listenerFunc: PlaybackStateDidChangeListener,
@@ -272,8 +280,9 @@ declare namespace MusicKit {
     api: AppleMusicAPI;
     queue: Queue;
     storefrontId: string;
-    currentPlaybackTime: number;
-    currentPlaybackDuration: number;
+    volume: number;
+    readonly currentPlaybackTime: number;
+    readonly currentPlaybackDuration: number;
     readonly isAuthorized: boolean;
     authorize: () => void;
     unauthorize: () => void;

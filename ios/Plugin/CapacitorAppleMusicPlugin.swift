@@ -91,6 +91,10 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
         call.resolve([resultKey: true])
     }
 
+    @objc func setVolume(_ call: CAPPluginCall) {
+        call.resolve([resultKey: true])
+    }
+
     @objc func isAuthorized(_ call: CAPPluginCall) {
         var result = false
         if MusicAuthorization.currentStatus == .authorized {

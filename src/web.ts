@@ -43,7 +43,7 @@ export class CapacitorAppleMusicWeb
   async isAuthorized(): Promise<{ result: boolean }> {
     let authorized = false;
     try {
-      authorized = MusicKit.getInstance().isAuthorized;
+      authorized = Boolean(MusicKit.getInstance()?.isAuthorized);
     } catch (error) {
       console.log(error);
     }
@@ -71,10 +71,13 @@ export class CapacitorAppleMusicWeb
   player: Howl | undefined;
   defaultVolume = 1.0;
 
-  async reset(): Promise<void> {
+  async resetMusicKit(): Promise<void> {
     MusicKit.getInstance().volume = this.defaultVolume;
     await MusicKit.getInstance().stop();
     await MusicKit.getInstance().queue.reset();
+  }
+
+  async resetPreviewPlayer(): Promise<void> {
     if (this.player) {
       this.player.stop();
       this.player.off('play');
@@ -85,8 +88,27 @@ export class CapacitorAppleMusicWeb
     }
   }
 
-  async setSong(options: { songId: string }): Promise<{ result: boolean }> {
+  async reset(): Promise<void> {
+    await this.resetMusicKit();
+    this.resetPreviewPlayer();
+  }
+
+  async setSong(options: {
+    songId: string;
+    previewUrl?: string;
+  }): Promise<{ result: boolean }> {
     try {
+      if (!(await this.isAuthorized()).result) {
+        if (options.previewUrl) {
+          this.resetPreviewPlayer();
+          console.log('🎵 ------ unAuth preview ---------', options.previewUrl);
+          this.setPlayer(options.previewUrl);
+          return { result: true };
+        } else {
+          return { result: false };
+        }
+      }
+
       const catalogResult = await MusicKit.getInstance().api.music(
         `v1/catalog/jp/songs/${options.songId}`,
       );
@@ -131,6 +153,7 @@ export class CapacitorAppleMusicWeb
       }
     } catch (error) {
       console.log(error);
+      return { result: false };
     }
     return { result: true };
   }
@@ -267,7 +290,10 @@ interface CapacitorAppleMusicPlugin {
   isAuthorized(): Promise<{ result: boolean }>;
   authorize(): Promise<{ result: boolean }>;
   unauthorize(): Promise<{ result: boolean }>;
-  setSong(options: { songId: string }): Promise<{ result: boolean }>;
+  setSong(options: {
+    songId: string;
+    previewUrl?: string;
+  }): Promise<{ result: boolean }>;
   play(): Promise<{ result: boolean }>;
   stop(): Promise<{ result: boolean }>;
   pause(): Promise<{ result: boolean }>;

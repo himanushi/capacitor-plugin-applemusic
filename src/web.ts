@@ -215,6 +215,13 @@ export class CapacitorAppleMusicWeb
     this.player.on('stop', () => {
       this.notifyListeners('playbackStateDidChange', { result: 'stopped' });
     });
+    this.player.on('seek', () => {
+      if (this.fadeoutId !== undefined) {
+        clearTimeout(this.fadeoutId);
+        this.fadeoutId = undefined;
+      }
+      this.notifyListeners('playbackStateDidChange', { result: 'paused' });
+    });
   }
 
   async play(): Promise<{ result: boolean }> {

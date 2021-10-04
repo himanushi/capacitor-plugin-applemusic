@@ -256,11 +256,10 @@ export class CapacitorAppleMusicWeb
   }): Promise<{ result: boolean }> {
     let result = false;
     try {
-      const seekTime = options.playbackTime / 1000;
       if (this.player) {
-        this.player.seek(seekTime);
+        this.player.seek(options.playbackTime);
       } else {
-        MusicKit.getInstance().seekToTime(seekTime);
+        MusicKit.getInstance().seekToTime(options.playbackTime);
       }
       result = true;
     } catch (error) {

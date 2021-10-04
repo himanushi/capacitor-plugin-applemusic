@@ -159,7 +159,7 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
         Task {
             var duration = 0.0
             if let currentItem = previewPlayer?.currentItem {
-                duration = Double(CMTimeGetSeconds(currentItem.duration))
+                duration = currentItem.asset.duration.seconds
             } else if let playbackDuration = MPMusicPlayerController.applicationMusicPlayer.nowPlayingItem?.playbackDuration {
                 duration = playbackDuration
             }

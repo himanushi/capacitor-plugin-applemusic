@@ -164,10 +164,23 @@ export class CapacitorAppleMusicWeb
       html5: true,
       preload: false,
       src: previewUrl,
-      volume: this.defaultVolume,
+      volume: 0,
     });
 
+    const fadeouttime = 2000;
+
+    const fadeIn = () => {
+      if (!this.player) return;
+
+      if (this.player.volume() === 0) {
+        this.player.fade(0, this.defaultVolume, fadeouttime);
+      } else {
+        this.player.volume(this.defaultVolume);
+      }
+    };
+
     this.player.on('play', () => {
+      fadeIn();
       this.notifyListeners('playbackStateDidChange', { result: 'playing' });
     });
     this.player.on('pause', () => {

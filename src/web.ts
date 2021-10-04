@@ -244,7 +244,7 @@ export class CapacitorAppleMusicWeb
   async currentPlaybackTime(): Promise<{ result: number }> {
     let playbackTime = 0;
     if (this.player) {
-      playbackTime = this.player.duration();
+      playbackTime = this.player.seek();
     } else {
       playbackTime = MusicKit.getInstance().currentPlaybackTime;
     }

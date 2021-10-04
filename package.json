@@ -1,6 +1,6 @@
 {
   "name": "capacitor-plugin-applemusic",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "description": "capacitor plugin apple music",
   "main": "dist/plugin.js",
   "module": "dist/esm/index.js",

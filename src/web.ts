@@ -72,7 +72,7 @@ export class CapacitorAppleMusicWeb
 
   async reset(): Promise<void> {
     await MusicKit.getInstance().stop();
-    await MusicKit.getInstance().setQueue({ songs: [] });
+    await MusicKit.getInstance().queue.reset();
     if (this.player) {
       this.player.stop();
       this.player = undefined;
@@ -81,11 +81,11 @@ export class CapacitorAppleMusicWeb
 
   async setSong(options: { songId: string }): Promise<{ result: boolean }> {
     try {
-      await this.reset();
-
       const catalogResult = await MusicKit.getInstance().api.music(
         `v1/catalog/jp/songs/${options.songId}`,
       );
+
+      await this.reset();
 
       if (!('data' in catalogResult.data)) return { result: false };
 
@@ -270,6 +270,7 @@ declare namespace MusicKit {
 
   interface MusicKitInstance {
     api: AppleMusicAPI;
+    queue: Queue;
     storefrontId: string;
     currentPlaybackTime: number;
     currentPlaybackDuration: number;
@@ -336,6 +337,10 @@ declare namespace MusicKit {
         purchasedId?: string;
       };
     };
+  }
+
+  interface Queue {
+    reset: () => void;
   }
 
   enum PlaybackStates {

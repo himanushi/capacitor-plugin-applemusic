@@ -2,6 +2,7 @@
 
 import type { PluginListenerHandle } from '@capacitor/core';
 import { WebPlugin, registerPlugin } from '@capacitor/core';
+import { Howl } from 'howler';
 
 export class CapacitorAppleMusicWeb
   extends WebPlugin
@@ -67,8 +68,21 @@ export class CapacitorAppleMusicWeb
     return { result: true };
   }
 
+  player: Howl | undefined;
+
+  async reset(): Promise<void> {
+    await MusicKit.getInstance().stop();
+    await MusicKit.getInstance().setQueue({ songs: [] });
+    if (this.player) {
+      this.player.stop();
+      this.player = undefined;
+    }
+  }
+
   async setSong(options: { songId: string }): Promise<{ result: boolean }> {
     try {
+      await this.reset();
+
       const catalogResult = await MusicKit.getInstance().api.music(
         `v1/catalog/jp/songs/${options.songId}`,
       );
@@ -99,10 +113,14 @@ export class CapacitorAppleMusicWeb
         const purchasedTrack = tracks.find(
           trk => trk.attributes.playParams.purchasedId === options.songId,
         );
+        const previewUrl = track.attributes.previews[0]?.url;
 
         if (purchasedTrack) {
           console.log('🎵 ------ iTunes ---------');
           await MusicKit.getInstance().setQueue({ songs: [purchasedTrack.id] });
+        } else if (previewUrl) {
+          console.log('🎵 ------ preview ---------', previewUrl);
+          this.setPlayer(previewUrl);
         }
       }
     } catch (error) {
@@ -111,10 +129,24 @@ export class CapacitorAppleMusicWeb
     return { result: true };
   }
 
+  setPlayer(previewUrl: string): void {
+    this.player = new Howl({
+      autoplay: false,
+      html5: true,
+      preload: false,
+      src: previewUrl,
+      volume: 0,
+    });
+  }
+
   async play(): Promise<{ result: boolean }> {
     let result = false;
     try {
-      await MusicKit.getInstance().play();
+      if (this.player) {
+        this.player.play();
+      } else {
+        await MusicKit.getInstance().play();
+      }
       result = true;
     } catch (error) {
       console.log(error);
@@ -125,7 +157,11 @@ export class CapacitorAppleMusicWeb
   async stop(): Promise<{ result: boolean }> {
     let result = false;
     try {
-      await MusicKit.getInstance().stop();
+      if (this.player) {
+        this.player.stop();
+      } else {
+        await MusicKit.getInstance().stop();
+      }
       result = true;
     } catch (error) {
       console.log(error);
@@ -136,7 +172,11 @@ export class CapacitorAppleMusicWeb
   async pause(): Promise<{ result: boolean }> {
     let result = false;
     try {
-      await MusicKit.getInstance().pause();
+      if (this.player) {
+        this.player.pause();
+      } else {
+        await MusicKit.getInstance().pause();
+      }
       result = true;
     } catch (error) {
       console.log(error);
@@ -145,11 +185,23 @@ export class CapacitorAppleMusicWeb
   }
 
   async currentPlaybackDuration(): Promise<{ result: number }> {
-    return { result: MusicKit.getInstance().currentPlaybackDuration };
+    let duration = 0;
+    if (this.player) {
+      duration = this.player.duration();
+    } else {
+      duration = await MusicKit.getInstance().currentPlaybackDuration;
+    }
+    return { result: duration };
   }
 
   async currentPlaybackTime(): Promise<{ result: number }> {
-    return { result: MusicKit.getInstance().currentPlaybackTime };
+    let playbackTime = 0;
+    if (this.player) {
+      playbackTime = this.player.duration();
+    } else {
+      playbackTime = MusicKit.getInstance().currentPlaybackTime;
+    }
+    return { result: playbackTime };
   }
 
   async seekToTime(options: {
@@ -157,7 +209,12 @@ export class CapacitorAppleMusicWeb
   }): Promise<{ result: boolean }> {
     let result = false;
     try {
-      MusicKit.getInstance().seekToTime(options.playbackTime);
+      const seekTime = options.playbackTime / 1000;
+      if (this.player) {
+        this.player.seek(seekTime);
+      } else {
+        MusicKit.getInstance().seekToTime(seekTime);
+      }
       result = true;
     } catch (error) {
       console.log(error);

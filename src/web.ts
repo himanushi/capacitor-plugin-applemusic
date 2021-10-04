@@ -70,6 +70,7 @@ export class CapacitorAppleMusicWeb
 
   player: Howl | undefined;
   defaultVolume = 1.0;
+  fadeoutId: NodeJS.Timeout | undefined;
 
   async resetMusicKit(): Promise<void> {
     MusicKit.getInstance().volume = this.defaultVolume;
@@ -78,6 +79,10 @@ export class CapacitorAppleMusicWeb
   }
 
   async resetPreviewPlayer(): Promise<void> {
+    if (this.fadeoutId !== undefined) {
+      clearTimeout(this.fadeoutId);
+      this.fadeoutId = undefined;
+    }
     if (this.player) {
       this.player.stop();
       this.player.off('play');
@@ -179,8 +184,26 @@ export class CapacitorAppleMusicWeb
       }
     };
 
+    const fadeOut = () => {
+      if (!this.player || this.fadeoutId !== undefined) return;
+
+      const seek = this.player.seek() as number;
+
+      const time = (this.player.duration() - seek) as number;
+
+      const ms = time * 1000;
+
+      const timeout = ms - fadeouttime;
+
+      this.fadeoutId = setTimeout(() => {
+        if (!this.player) return;
+        this.player.fade(this.defaultVolume, 0, fadeouttime);
+      }, timeout);
+    };
+
     this.player.on('play', () => {
       fadeIn();
+      fadeOut();
       this.notifyListeners('playbackStateDidChange', { result: 'playing' });
     });
     this.player.on('pause', () => {

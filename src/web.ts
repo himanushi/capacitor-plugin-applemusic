@@ -77,6 +77,10 @@ export class CapacitorAppleMusicWeb
     await MusicKit.getInstance().queue.reset();
     if (this.player) {
       this.player.stop();
+      this.player.off('play');
+      this.player.off('pause');
+      this.player.off('end');
+      this.player.off('stop');
       this.player = undefined;
     }
   }
@@ -138,6 +142,19 @@ export class CapacitorAppleMusicWeb
       preload: false,
       src: previewUrl,
       volume: this.defaultVolume,
+    });
+
+    this.player.on('play', () => {
+      this.notifyListeners('playbackStateDidChange', { result: 'playing' });
+    });
+    this.player.on('pause', () => {
+      this.notifyListeners('playbackStateDidChange', { result: 'paused' });
+    });
+    this.player.on('end', () => {
+      this.notifyListeners('playbackStateDidChange', { result: 'completed' });
+    });
+    this.player.on('stop', () => {
+      this.notifyListeners('playbackStateDidChange', { result: 'stopped' });
     });
   }
 

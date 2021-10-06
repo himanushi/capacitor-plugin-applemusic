@@ -109,8 +109,25 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
             let status = await MusicAuthorization.request()
             if status == .authorized {
                 result = true
+            } else {
+                guard let settingsURL = await URL(string: UIApplication.openSettingsURLString ) else {
+                    call.resolve([resultKey: result])
+                    return
+                }
+                await UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
             }
             call.resolve([resultKey: result])
+        }
+    }
+
+    @objc func unauthorize(_ call: CAPPluginCall) {
+        Task {
+            guard let settingsURL = await URL(string: UIApplication.openSettingsURLString ) else {
+                call.resolve([resultKey: false])
+                return
+            }
+            await UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
+            call.resolve([resultKey: true])
         }
     }
 

@@ -28,9 +28,16 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
 
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(self.playbackStateDidChange(notification:)),
-            name: Notification.Name.MPMusicPlayerControllerPlaybackStateDidChange,
+            selector: #selector(self.playbackStateDidChange),
+            name: .MPMusicPlayerControllerPlaybackStateDidChange,
             object: nil)
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(self.authorizationStatusDidChange),
+            name: UIApplication.didBecomeActiveNotification,
+            object: nil
+        )
     }
 
     deinit {
@@ -39,7 +46,7 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
 
     var prevPlaybackState: MPMusicPlaybackState = .stopped
     var started = false
-    @objc private func playbackStateDidChange(notification: NSNotification) {
+    @objc private func playbackStateDidChange() {
         var result = ""
 
         let currentDuration = MPMusicPlayerController.applicationMusicPlayer.nowPlayingItem?.playbackDuration ?? 0.0
@@ -82,6 +89,21 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
         }
     }
 
+    @objc private func authorizationStatusDidChange() {
+        Task {
+            let status = MusicAuthorization.currentStatus
+            if status == .notDetermined {
+                notifyListeners("authorizationStatusDidChange", data: ["result": "notDetermined"])
+            } else if status == .denied {
+                notifyListeners("authorizationStatusDidChange", data: ["result": "denied"])
+            } else if status == .restricted {
+                notifyListeners("authorizationStatusDidChange", data: ["result": "restricted"])
+            } else if status == .authorized {
+                notifyListeners("authorizationStatusDidChange", data: ["result": "authorized"])
+            }
+        }
+    }
+
     @objc func echo(_ call: CAPPluginCall) {
         let value = call.getString("value") ?? ""
         call.resolve(["value": value])
@@ -108,16 +130,8 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
             var result = false
             let status = await MusicAuthorization.request()
             if status == .authorized {
-                notifyListeners("authorizationStatusDidChange", data: ["result": "authorized"])
                 result = true
             } else {
-                if status == .notDetermined {
-                    notifyListeners("authorizationStatusDidChange", data: ["result": "notDetermined"])
-                } else if status == .denied {
-                    notifyListeners("authorizationStatusDidChange", data: ["result": "denied"])
-                } else if status == .restricted {
-                    notifyListeners("authorizationStatusDidChange", data: ["result": "restricted"])
-                }
                 guard let settingsURL = await URL(string: UIApplication.openSettingsURLString ) else {
                     call.resolve([resultKey: result])
                     return

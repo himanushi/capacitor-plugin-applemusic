@@ -16,6 +16,24 @@ export class CapacitorAppleMusicWeb
     this.notifyListeners('playbackStateDidChange', data);
   };
 
+  private authorizationStatusDidChange = (result: {
+    authorizationStatus: number;
+  }) => {
+    let status = '';
+    if (result.authorizationStatus === -1) {
+      status = 'unavailable';
+    } else if (result.authorizationStatus === 0) {
+      status = 'notDetermined';
+    } else if (result.authorizationStatus === 1) {
+      status = 'denied';
+    } else if (result.authorizationStatus === 2) {
+      status = 'restricted';
+    } else if (result.authorizationStatus === 3) {
+      status = 'authorized';
+    }
+    this.notifyListeners('authorizationStatusDidChange', { result: status });
+  };
+
   async echo(options: { value: string }): Promise<{ value: string }> {
     console.log('ECHO', options);
     return options;
@@ -31,6 +49,11 @@ export class CapacitorAppleMusicWeb
       musicKit.addEventListener(
         'playbackStateDidChange',
         this.playbackStateDidChange,
+      );
+
+      musicKit.addEventListener(
+        'authorizationStatusDidChange',
+        this.authorizationStatusDidChange,
       );
 
       configured = true;
@@ -330,6 +353,16 @@ export type PlaybackStateDidChangeListener = (state: {
   result: PlaybackStates;
 }) => void;
 
+export type AuthorizationStatus =
+  | 'unavailable'
+  | 'notDetermined'
+  | 'denied'
+  | 'restricted'
+  | 'authorized';
+export type AuthorizationStatusDidChangeListener = (state: {
+  result: AuthorizationStatus;
+}) => void;
+
 interface CapacitorAppleMusicPlugin {
   echo(options: { value: string }): Promise<{ value: string }>;
   configure(options: { config: MusicKit.Config }): Promise<{ result: boolean }>;
@@ -350,6 +383,10 @@ interface CapacitorAppleMusicPlugin {
   addListener(
     eventName: 'playbackStateDidChange',
     listenerFunc: PlaybackStateDidChangeListener,
+  ): Promise<PluginListenerHandle> & PluginListenerHandle;
+  addListener(
+    eventName: 'authorizationStatusDidChange',
+    listenerFunc: AuthorizationStatusDidChangeListener,
   ): Promise<PluginListenerHandle> & PluginListenerHandle;
 }
 
@@ -380,10 +417,7 @@ declare namespace MusicKit {
     stop: () => Promise<void>;
     pause: () => Promise<void>;
     seekToTime: (playbackTime: number) => Promise<void>;
-    addEventListener: (
-      eventName: string,
-      callback: (state: { oldState: number; state: number }) => void,
-    ) => number;
+    addEventListener: (eventName: string, callback: any) => number;
   }
 
   interface AppleMusicAPI {

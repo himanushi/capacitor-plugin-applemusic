@@ -27,6 +27,7 @@ npx cap sync
 * [`seekToTime(...)`](#seektotime)
 * [`setVolume(...)`](#setvolume)
 * [`addListener(...)`](#addlistener)
+* [`addListener(...)`](#addlistener)
 * [Interfaces](#interfaces)
 
 </docgen-index>
@@ -207,6 +208,22 @@ addListener(eventName: 'playbackStateDidChange', listenerFunc: PlaybackStateDidC
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **`eventName`**    | <code>"playbackStateDidChange"</code>                                                                                                                                    |
 | **`listenerFunc`** | <code>(state: { result: "none" \| "loading" \| "playing" \| "paused" \| "stopped" \| "ended" \| "seeking" \| "waiting" \| "stalled" \| "completed"; }) =&gt; void</code> |
+
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt; & <a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+
+--------------------
+
+
+### addListener(...)
+
+```typescript
+addListener(eventName: 'authorizationStatusDidChange', listenerFunc: AuthorizationStatusDidChangeListener) => Promise<PluginListenerHandle> & PluginListenerHandle
+```
+
+| Param              | Type                                                              |
+| ------------------ | ----------------------------------------------------------------- |
+| **`eventName`**    | <code>"authorizationStatusDidChange"</code>                       |
+| **`listenerFunc`** | <code>(state: { result: AuthorizationStatus; }) =&gt; void</code> |
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt; & <a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 

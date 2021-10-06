@@ -108,8 +108,16 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
             var result = false
             let status = await MusicAuthorization.request()
             if status == .authorized {
+                notifyListeners("authorizationStatusDidChange", data: ["result": "authorized"])
                 result = true
             } else {
+                if status == .notDetermined {
+                    notifyListeners("authorizationStatusDidChange", data: ["result": "notDetermined"])
+                } else if status == .denied {
+                    notifyListeners("authorizationStatusDidChange", data: ["result": "denied"])
+                } else if status == .restricted {
+                    notifyListeners("authorizationStatusDidChange", data: ["result": "restricted"])
+                }
                 guard let settingsURL = await URL(string: UIApplication.openSettingsURLString ) else {
                     call.resolve([resultKey: result])
                     return
@@ -122,6 +130,7 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
 
     @objc func unauthorize(_ call: CAPPluginCall) {
         Task {
+            // 設定アプリに遷移するだけなので authorizationStatusDidChange は発火させない
             guard let settingsURL = await URL(string: UIApplication.openSettingsURLString ) else {
                 call.resolve([resultKey: false])
                 return

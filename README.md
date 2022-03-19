@@ -101,12 +101,12 @@ unauthorize() => Promise<{ result: boolean; }>
 ### setSong(...)
 
 ```typescript
-setSong(options: { songId: string; previewUrl?: string; }) => Promise<{ result: boolean; }>
+setSong(options: { songId: string; previewUrl?: string; songTitle?: string; }) => Promise<{ result: boolean; }>
 ```
 
-| Param         | Type                                                  |
-| ------------- | ----------------------------------------------------- |
-| **`options`** | <code>{ songId: string; previewUrl?: string; }</code> |
+| Param         | Type                                                                      |
+| ------------- | ------------------------------------------------------------------------- |
+| **`options`** | <code>{ songId: string; previewUrl?: string; songTitle?: string; }</code> |
 
 **Returns:** <code>Promise&lt;{ result: boolean; }&gt;</code>
 

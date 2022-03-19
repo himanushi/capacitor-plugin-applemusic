@@ -51,10 +51,11 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
 
         let currentDuration = MPMusicPlayerController.applicationMusicPlayer.nowPlayingItem?.playbackDuration ?? 0.0
 
+        // 曲が終わる3秒前に一時停止をした場合は曲が再生終了したとみなす
         if started &&
-           (player.currentPlaybackTime == 0.0 || player.currentPlaybackTime >= currentDuration) &&
            player.playbackState == .paused &&
-           prevPlaybackState == .paused
+           prevPlaybackState == .playing &&
+           player.currentPlaybackTime + 3 >= currentDuration
         {
             result = "completed"
             prevPlaybackState = .stopped

@@ -235,6 +235,7 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
     @objc func setSong(_ call: CAPPluginCall) {
         let songId = call.getString("songId") ?? ""
         let previewUrl = call.getString("previewUrl") ?? ""
+        let songTitle = call.getString("songTitle")
         Task {
             var result = false
 
@@ -257,7 +258,7 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
                             ApplicationMusicPlayer.shared.queue = [track]
                             result = true
                         } else {
-                            let term = track.title
+                            let term = (songTitle ?? track.title)
                                             .replacingOccurrences(of: ",", with: " ")
                                             .addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)
                             let urlString = "https://api.music.apple.com/v1/me/library/search?term=\(term!)&types=library-songs&limit=25"

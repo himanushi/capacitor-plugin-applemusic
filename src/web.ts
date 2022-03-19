@@ -128,6 +128,7 @@ export class CapacitorAppleMusicWeb
   async setSong(options: {
     songId: string;
     previewUrl?: string;
+    songTitle?: string;
   }): Promise<{ result: boolean }> {
     try {
       if (!(await this.isAuthorized()).result) {
@@ -157,7 +158,10 @@ export class CapacitorAppleMusicWeb
         console.log('🎵 ------ Apple Music ---------');
         await MusicKit.getInstance().setQueue({ songs: [options.songId] });
       } else {
-        const term = track.attributes.name.replace(/[[\]()-.]/g, ' ');
+        const term = (options.songTitle ?? track.attributes.name).replace(
+          /[[\]()-.]/g,
+          ' ',
+        );
         const libraryResult = await MusicKit.getInstance().api.music(
           'v1/me/library/search',
           {
@@ -372,6 +376,7 @@ interface CapacitorAppleMusicPlugin {
   setSong(options: {
     songId: string;
     previewUrl?: string;
+    songTitle?: string;
   }): Promise<{ result: boolean }>;
   play(): Promise<{ result: boolean }>;
   stop(): Promise<{ result: boolean }>;

@@ -159,7 +159,7 @@ export class CapacitorAppleMusicWeb
         await MusicKit.getInstance().setQueue({ songs: [options.songId] });
       } else {
         const term = (options.songTitle ?? track.attributes.name).replace(
-          /[[\]()-.]/g,
+          /[[\]()-.,]/g,
           ' ',
         );
         const libraryResult = await MusicKit.getInstance().api.music(

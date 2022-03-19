@@ -259,6 +259,12 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
                             result = true
                         } else {
                             let term = (songTitle ?? track.title)
+                                            .replacingOccurrences(of: "[", with: " ")
+                                            .replacingOccurrences(of: "]", with: " ")
+                                            .replacingOccurrences(of: "(", with: " ")
+                                            .replacingOccurrences(of: ")", with: " ")
+                                            .replacingOccurrences(of: "-", with: " ")
+                                            .replacingOccurrences(of: ".", with: " ")
                                             .replacingOccurrences(of: ",", with: " ")
                                             .addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)
                             let urlString = "https://api.music.apple.com/v1/me/library/search?term=\(term!)&types=library-songs&limit=25"

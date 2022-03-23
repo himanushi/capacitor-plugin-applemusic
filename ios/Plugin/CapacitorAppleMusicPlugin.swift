@@ -278,8 +278,6 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
                                 if let purchasedTrack = response.results?.librarySongs?.data?.filter({ song in
                                     return song.attributes?.playParams?.purchasedID == songId
                                 }).first {
-                                    print("🎵 ------ iTunes ---------")
-                                    // Play a song purchased from iTunes.
                                     let query = MPMediaQuery.songs()
                                     let trackTitleFilter = MPMediaPropertyPredicate(
                                         value: purchasedTrack.attributes?.name,
@@ -292,7 +290,13 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
                                     let filterPredicates: Set<MPMediaPredicate> = [trackTitleFilter, albumTitleFilter]
                                     query.filterPredicates = filterPredicates
                                     if (query.items?.count ?? 0) > 0 {
+                                        print("🎵 ------ iTunes ---------")
                                         player.setQueue(with: query)
+                                        result = true
+                                    } else if let trackPreviewUrl = track.previewAssets?.first?.url {
+                                        // 購入したけどまだ反映されていない場合。大体数時間~数日反映に時間がかかる。
+                                        print("🎵 ------ preview ---------", trackPreviewUrl)
+                                        setPlayer(trackPreviewUrl)
                                         result = true
                                     }
                                 } else if let trackPreviewUrl = track.previewAssets?.first?.url {

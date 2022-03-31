@@ -188,8 +188,43 @@ export class CapacitorAppleMusicWeb
         }
       }
     } catch (error) {
-      console.log(error);
-      return { result: false };
+      try {
+        // Apple ID が 404 の場合
+        console.log(error);
+
+        if (!options.songTitle) {
+          return { result: false };
+        }
+
+        const term = options.songTitle.replace(/[[\]()-.,]/g, ' ');
+        const libraryResult = await MusicKit.getInstance().api.music(
+          'v1/me/library/search',
+          {
+            term,
+            types: ['library-songs'],
+            limit: 25,
+          },
+        );
+
+        if (!('results' in libraryResult.data)) return { result: false };
+
+        const tracks = libraryResult.data.results['library-songs']?.data || [];
+        const purchasedTrack = tracks.find(
+          trk => trk.attributes.playParams?.purchasedId === options.songId,
+        );
+        const previewUrl = options.previewUrl;
+
+        if (purchasedTrack) {
+          console.log('🎵 ------ iTunes ---------');
+          await MusicKit.getInstance().setQueue({ songs: [purchasedTrack.id] });
+        } else if (previewUrl) {
+          console.log('🎵 ------ preview ---------', previewUrl);
+          this.setPlayer(previewUrl);
+        }
+      } catch (error) {
+        console.log(error);
+        return { result: false };
+      }
     }
     return { result: true };
   }

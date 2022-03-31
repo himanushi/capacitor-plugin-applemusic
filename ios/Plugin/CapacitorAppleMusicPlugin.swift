@@ -317,6 +317,56 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
                 }
             } catch {
                 print(error)
+
+                // Apple ID が 404 である場合
+                do {
+                    if let title = songTitle {
+                       let term = title
+                                       .replacingOccurrences(of: "[", with: " ")
+                                       .replacingOccurrences(of: "]", with: " ")
+                                       .replacingOccurrences(of: "(", with: " ")
+                                       .replacingOccurrences(of: ")", with: " ")
+                                       .replacingOccurrences(of: "-", with: " ")
+                                       .replacingOccurrences(of: ".", with: " ")
+                                       .replacingOccurrences(of: ",", with: " ")
+                                       .addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)
+                       let urlString = "https://api.music.apple.com/v1/me/library/search?term=\(term!)&types=library-songs&limit=25"
+
+                       if let url = URL(string: urlString) {
+
+                           let data = try await MusicDataRequest(urlRequest: URLRequest(url: url)).response()
+                           let response: LibrarySongsResults = try JSONDecoder().decode(LibrarySongsResults.self, from: data.data)
+
+                           if let purchasedTrack = response.results?.librarySongs?.data?.filter({ song in
+                               return song.attributes?.playParams?.purchasedID == songId
+                           }).first {
+                               let query = MPMediaQuery.songs()
+                               let trackTitleFilter = MPMediaPropertyPredicate(
+                                   value: purchasedTrack.attributes?.name,
+                                   forProperty: MPMediaItemPropertyTitle,
+                                   comparisonType: .equalTo)
+                               let albumTitleFilter = MPMediaPropertyPredicate(
+                                   value: purchasedTrack.attributes?.albumName,
+                                   forProperty: MPMediaItemPropertyAlbumTitle,
+                                   comparisonType: .equalTo)
+                               let filterPredicates: Set<MPMediaPredicate> = [trackTitleFilter, albumTitleFilter]
+                               query.filterPredicates = filterPredicates
+                               if (query.items?.count ?? 0) > 0 {
+                                   print("🎵 ------ iTunes ---------")
+                                   player.setQueue(with: query)
+                                   result = true
+                               } else if let previewUrl2 = URL(string: previewUrl) {
+                                   // 購入したけどまだ反映されていない場合。大体数時間~数日反映に時間がかかる。
+                                   print("🎵 ------ preview ---------", previewUrl)
+                                   setPlayer(previewUrl2)
+                                   result = true
+                               }
+                           }
+                       }
+                    }
+                } catch {
+                    print(error)
+                }
             }
 
             call.resolve([resultKey: result])

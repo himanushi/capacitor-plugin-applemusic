@@ -130,6 +130,11 @@ export class CapacitorAppleMusicWeb
     previewUrl?: string;
     songTitle?: string;
   }): Promise<{ result: boolean }> {
+    const replaceName = (name: string) => {
+      // 名前が長すぎる場合は検索で引っかからないのでなるべく短い名前にする
+      return name.replace(/(?!^)(\[|\(|-|:|〜|~).*/g, '');
+    };
+
     try {
       if (!(await this.isAuthorized()).result) {
         if (options.previewUrl) {
@@ -158,10 +163,7 @@ export class CapacitorAppleMusicWeb
         console.log('🎵 ------ Apple Music ---------');
         await MusicKit.getInstance().setQueue({ songs: [options.songId] });
       } else {
-        const term = (options.songTitle ?? track.attributes.name).replace(
-          /[[\]()-.,]/g,
-          ' ',
-        );
+        const term = replaceName(options.songTitle ?? track.attributes.name);
         const libraryResult = await MusicKit.getInstance().api.music(
           'v1/me/library/search',
           {
@@ -196,7 +198,7 @@ export class CapacitorAppleMusicWeb
           return { result: false };
         }
 
-        const term = options.songTitle.replace(/[[\]()-.,]/g, ' ');
+        const term = replaceName(options.songTitle);
         const libraryResult = await MusicKit.getInstance().api.music(
           'v1/me/library/search',
           {

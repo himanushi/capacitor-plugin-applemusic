@@ -232,6 +232,14 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
         }
     }
 
+    @objc func replaceName(_ name: String) -> String! {
+        let regex = try! NSRegularExpression(pattern: #"(?!^)(\[|\(|-|:|〜|~).*"#, options: NSRegularExpression.Options.caseInsensitive)
+        let range = NSMakeRange(0, name.count)
+        return regex
+            .stringByReplacingMatches(in: name, options: [], range: range, withTemplate: "")
+            .addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)
+    }
+
     var playable = false
     @objc func setSong(_ call: CAPPluginCall) {
         let songId = call.getString("songId") ?? ""
@@ -259,15 +267,7 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
                             ApplicationMusicPlayer.shared.queue = [track]
                             result = true
                         } else {
-                            let term = (songTitle ?? track.title)
-                                            .replacingOccurrences(of: "[", with: " ")
-                                            .replacingOccurrences(of: "]", with: " ")
-                                            .replacingOccurrences(of: "(", with: " ")
-                                            .replacingOccurrences(of: ")", with: " ")
-                                            .replacingOccurrences(of: "-", with: " ")
-                                            .replacingOccurrences(of: ".", with: " ")
-                                            .replacingOccurrences(of: ",", with: " ")
-                                            .addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)
+                            let term = replaceName(songTitle ?? track.title)
                             let urlString = "https://api.music.apple.com/v1/me/library/search?term=\(term!)&types=library-songs&limit=25"
 
                             if let url = URL(string: urlString) {
@@ -321,15 +321,7 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
                 // Apple ID が 404 である場合
                 do {
                     if let title = songTitle {
-                       let term = title
-                                       .replacingOccurrences(of: "[", with: " ")
-                                       .replacingOccurrences(of: "]", with: " ")
-                                       .replacingOccurrences(of: "(", with: " ")
-                                       .replacingOccurrences(of: ")", with: " ")
-                                       .replacingOccurrences(of: "-", with: " ")
-                                       .replacingOccurrences(of: ".", with: " ")
-                                       .replacingOccurrences(of: ",", with: " ")
-                                       .addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)
+                       let term = replaceName(title)
                        let urlString = "https://api.music.apple.com/v1/me/library/search?term=\(term!)&types=library-songs&limit=25"
 
                        if let url = URL(string: urlString) {

@@ -135,6 +135,38 @@ export class CapacitorAppleMusicWeb
       return name.replace(/(?!^)(\[|\(|-|:|〜|~).*/g, '');
     };
 
+    const getLibrarySongs = async (name: string) => {
+      const endpoint = `/v1/me/library/search?term=${replaceName(
+        name,
+      )}&types=library-songs`;
+      return await getLoopLibrarySongs(endpoint);
+    };
+
+    const getLoopLibrarySongs = async (endpoint: string) => {
+      const results: MusicKit.APIResultData[] = [];
+      const response = await searchLibrarySongs(`${endpoint}&limit=25`);
+
+      if (!('results' in response.data)) return results;
+
+      if (response.data.results['library-songs']?.data) {
+        results.push(...response.data.results['library-songs'].data);
+      }
+
+      if (response.data.results['library-songs']?.next) {
+        results.push(
+          ...(await getLoopLibrarySongs(
+            response.data.results['library-songs']?.next,
+          )),
+        );
+      }
+
+      return results;
+    };
+
+    const searchLibrarySongs = async (endpoint: string) => {
+      return await MusicKit.getInstance().api.music(endpoint);
+    };
+
     try {
       if (!(await this.isAuthorized()).result) {
         if (options.previewUrl) {
@@ -163,19 +195,9 @@ export class CapacitorAppleMusicWeb
         console.log('🎵 ------ Apple Music ---------');
         await MusicKit.getInstance().setQueue({ songs: [options.songId] });
       } else {
-        const term = replaceName(options.songTitle ?? track.attributes.name);
-        const libraryResult = await MusicKit.getInstance().api.music(
-          'v1/me/library/search',
-          {
-            term,
-            types: ['library-songs'],
-            limit: 25,
-          },
+        const tracks = await getLibrarySongs(
+          options.songTitle ?? track.attributes.name,
         );
-
-        if (!('results' in libraryResult.data)) return { result: false };
-
-        const tracks = libraryResult.data.results['library-songs']?.data || [];
         const purchasedTrack = tracks.find(
           trk => trk.attributes.playParams?.purchasedId === options.songId,
         );
@@ -198,19 +220,7 @@ export class CapacitorAppleMusicWeb
           return { result: false };
         }
 
-        const term = replaceName(options.songTitle);
-        const libraryResult = await MusicKit.getInstance().api.music(
-          'v1/me/library/search',
-          {
-            term,
-            types: ['library-songs'],
-            limit: 25,
-          },
-        );
-
-        if (!('results' in libraryResult.data)) return { result: false };
-
-        const tracks = libraryResult.data.results['library-songs']?.data || [];
+        const tracks = await getLibrarySongs(options.songTitle);
         const purchasedTrack = tracks.find(
           trk => trk.attributes.playParams?.purchasedId === options.songId,
         );
@@ -496,6 +506,8 @@ declare namespace MusicKit {
       results: {
         'library-songs'?: {
           data: APIResultData[];
+          next?: string;
+          href: string;
         };
       };
     };

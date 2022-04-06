@@ -234,13 +234,31 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
             .addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)
     }
 
-    func getLibrarySongs(_ name: String) async -> LibrarySongsResults? {
-        let urlString =
-            "https://api.music.apple.com/v1/me/library/search?term=\(replaceName(name)!)&types=library-songs&limit=25"
-        return await getNextLibrarySongs(urlString)
+    func getLibrarySongs(_ name: String) async -> [CapacitorAppleMusicPlugin.Datum] {
+        let endpoint =
+            "/v1/me/library/search?term=\(replaceName(name)!)&types=library-songs"
+        return await getLoopLibrarySongs(endpoint)
     }
 
-    func getNextLibrarySongs(_ urlString: String) async -> LibrarySongsResults? {
+    func getLoopLibrarySongs(_ endpoint: String) async -> [CapacitorAppleMusicPlugin.Datum] {
+        let urlString = "https://api.music.apple.com\(endpoint)&limit=25"
+        var results: [CapacitorAppleMusicPlugin.Datum] = []
+
+        let response = await searchLibrarySongs(urlString)
+
+        if let data = response?.results?.librarySongs?.data {
+            results.append(contentsOf: data)
+        }
+
+        if let nextUrl = response?.results?.librarySongs?.next {
+            let data = await getLoopLibrarySongs(nextUrl)
+            results.append(contentsOf: data)
+        }
+
+        return results
+    }
+
+    func searchLibrarySongs(_ urlString: String) async -> LibrarySongsResults? {
         if let url = URL(string: urlString) {
             do {
                 let data = try await MusicDataRequest(urlRequest: URLRequest(url: url)).response()
@@ -279,8 +297,9 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
                             // Apple Music
                             ApplicationMusicPlayer.shared.queue = [track]
                             result = true
-                        } else if let response = await getLibrarySongs(songTitle ?? track.title) {
-                            if let purchasedTrack = response.results?.librarySongs?.data?.filter({
+                        } else {
+                            let songs = await getLibrarySongs(songTitle ?? track.title)
+                            if let purchasedTrack = songs.filter({
                                 song in
                                 return song.attributes?.playParams?.purchasedID == songId
                             }).first {
@@ -326,8 +345,9 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
                 print(error)
 
                 // Apple ID が 404 である場合
-                if let title = songTitle, let response = await getLibrarySongs(title) {
-                    if let purchasedTrack = response.results?.librarySongs?.data?.filter({ song in
+                if let title = songTitle {
+                    let songs = await getLibrarySongs(title)
+                    if let purchasedTrack = songs.filter({ song in
                         return song.attributes?.playParams?.purchasedID == songId
                     }).first {
                         let query = MPMediaQuery.songs()

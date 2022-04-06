@@ -1,12 +1,10 @@
-import Foundation
 import Capacitor
+import Foundation
 import MediaPlayer
 import MusicKit
 
-/**
- * Please read the Capacitor iOS Plugin Development Guide
- * here: https://capacitorjs.com/docs/plugins/ios
- */
+/// Please read the Capacitor iOS Plugin Development Guide
+/// here: https://capacitorjs.com/docs/plugins/ios
 let resultKey = "result"
 
 @available(iOS 15.0, *)
@@ -20,7 +18,8 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
         do {
             // AVPlayer をサイレントモードとバックグラウンドで再生する
             // TODO: interruptSpokenAudioAndMixWithOthers を設定すると AVPlayer による MPRemoteCommandCenter が有効にならないのでどうにかすること
-            try audioSession.setCategory(.playback, mode: .default, options: [.interruptSpokenAudioAndMixWithOthers])
+            try audioSession.setCategory(
+                .playback, mode: .default, options: [.interruptSpokenAudioAndMixWithOthers])
             try audioSession.setActive(true)
         } catch {
             print(error)
@@ -49,37 +48,24 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
     @objc private func playbackStateDidChange() {
         var result = ""
 
-        let currentDuration = MPMusicPlayerController.applicationMusicPlayer.nowPlayingItem?.playbackDuration ?? 0.0
+        let currentDuration =
+            MPMusicPlayerController.applicationMusicPlayer.nowPlayingItem?.playbackDuration ?? 0.0
 
         // 曲が終わる3秒前に一時停止をした場合は曲が再生終了したとみなす
-        if started &&
-           player.playbackState == .paused &&
-           prevPlaybackState == .playing &&
-           player.currentPlaybackTime + 3 >= currentDuration
+        if started && player.playbackState == .paused && prevPlaybackState == .playing
+            && player.currentPlaybackTime + 3 >= currentDuration
         {
             result = "completed"
             prevPlaybackState = .stopped
             started = false
-        }
-        else if player.playbackState == .playing &&
-                prevPlaybackState != .playing
-        {
+        } else if player.playbackState == .playing && prevPlaybackState != .playing {
             result = "playing"
             started = true
-        }
-        else if player.playbackState == .paused &&
-                prevPlaybackState != .paused
-        {
+        } else if player.playbackState == .paused && prevPlaybackState != .paused {
             result = "paused"
-        }
-        else if player.playbackState == .stopped &&
-                prevPlaybackState != .stopped
-        {
+        } else if player.playbackState == .stopped && prevPlaybackState != .stopped {
             result = "stopped"
-        }
-        else if player.playbackState == .interrupted &&
-                prevPlaybackState != .interrupted
-        {
+        } else if player.playbackState == .interrupted && prevPlaybackState != .interrupted {
             result = "paused"
         }
 
@@ -133,7 +119,8 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
             if status == .authorized {
                 result = true
             } else {
-                guard let settingsURL = await URL(string: UIApplication.openSettingsURLString ) else {
+                guard let settingsURL = await URL(string: UIApplication.openSettingsURLString)
+                else {
                     call.resolve([resultKey: result])
                     return
                 }
@@ -146,7 +133,7 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
     @objc func unauthorize(_ call: CAPPluginCall) {
         Task {
             // 設定アプリに遷移するだけなので authorizationStatusDidChange は発火させない
-            guard let settingsURL = await URL(string: UIApplication.openSettingsURLString ) else {
+            guard let settingsURL = await URL(string: UIApplication.openSettingsURLString) else {
                 call.resolve([resultKey: false])
                 return
             }
@@ -161,7 +148,7 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
             do {
                 if (previewPlayer?.currentItem) != nil {
                     await previewPlayer?.play()
-                } else if(playable) {
+                } else if playable {
                     try await ApplicationMusicPlayer.shared.play()
                 } else {
                     player.play()
@@ -201,7 +188,9 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
             var duration = 0.0
             if let currentItem = previewPlayer?.currentItem {
                 duration = currentItem.asset.duration.seconds
-            } else if let playbackDuration = MPMusicPlayerController.applicationMusicPlayer.nowPlayingItem?.playbackDuration {
+            } else if let playbackDuration = MPMusicPlayerController.applicationMusicPlayer
+                .nowPlayingItem?.playbackDuration
+            {
                 duration = playbackDuration
             }
             call.resolve([resultKey: duration])
@@ -224,7 +213,9 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
         let playbackTime = call.getDouble("playbackTime") ?? 0.0
         Task {
             if let prePlayer = previewPlayer {
-                await prePlayer.seek(to: CMTimeMakeWithSeconds(playbackTime, preferredTimescale: Int32(NSEC_PER_SEC)))
+                await prePlayer.seek(
+                    to: CMTimeMakeWithSeconds(playbackTime, preferredTimescale: Int32(NSEC_PER_SEC))
+                )
             } else {
                 ApplicationMusicPlayer.shared.playbackTime = playbackTime
             }
@@ -233,15 +224,19 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
     }
 
     func replaceName(_ name: String) -> String! {
-        let regex = try! NSRegularExpression(pattern: #"(?!^)(\[|\(|-|:|〜|~).*"#, options: NSRegularExpression.Options.caseInsensitive)
+        let regex = try! NSRegularExpression(
+            pattern: #"(?!^)(\[|\(|-|:|〜|~).*"#,
+            options: NSRegularExpression.Options.caseInsensitive)
         let range = NSMakeRange(0, name.count)
-        return regex
+        return
+            regex
             .stringByReplacingMatches(in: name, options: [], range: range, withTemplate: "")
             .addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)
     }
-    
+
     func getLibrarySongs(_ name: String) async -> LibrarySongsResults? {
-        let urlString = "https://api.music.apple.com/v1/me/library/search?term=\(replaceName(name)!)&types=library-songs&limit=25"
+        let urlString =
+            "https://api.music.apple.com/v1/me/library/search?term=\(replaceName(name)!)&types=library-songs&limit=25"
         return await getNextLibrarySongs(urlString)
     }
 
@@ -271,20 +266,22 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
 
                     await reset()
 
-                    let request = MusicCatalogResourceRequest<MusicKit.Song>(matching: \.id, equalTo: MusicItemID(songId))
+                    let request = MusicCatalogResourceRequest<MusicKit.Song>(
+                        matching: \.id, equalTo: MusicItemID(songId))
                     let response = try await request.response()
 
                     if let track = response.items.first {
 
                         playable = track.playParameters != nil
 
-                        if(playable) {
+                        if playable {
                             print("🎵 ------ Apple Music ---------")
                             // Apple Music
                             ApplicationMusicPlayer.shared.queue = [track]
                             result = true
                         } else if let response = await getLibrarySongs(songTitle ?? track.title) {
-                            if let purchasedTrack = response.results?.librarySongs?.data?.filter({ song in
+                            if let purchasedTrack = response.results?.librarySongs?.data?.filter({
+                                song in
                                 return song.attributes?.playParams?.purchasedID == songId
                             }).first {
                                 let query = MPMediaQuery.songs()
@@ -296,7 +293,9 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
                                     value: purchasedTrack.attributes?.albumName,
                                     forProperty: MPMediaItemPropertyAlbumTitle,
                                     comparisonType: .equalTo)
-                                let filterPredicates: Set<MPMediaPredicate> = [trackTitleFilter, albumTitleFilter]
+                                let filterPredicates: Set<MPMediaPredicate> = [
+                                    trackTitleFilter, albumTitleFilter,
+                                ]
                                 query.filterPredicates = filterPredicates
                                 if (query.items?.count ?? 0) > 0 {
                                     print("🎵 ------ iTunes ---------")
@@ -328,31 +327,33 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
 
                 // Apple ID が 404 である場合
                 if let title = songTitle, let response = await getLibrarySongs(title) {
-                   if let purchasedTrack = response.results?.librarySongs?.data?.filter({ song in
-                       return song.attributes?.playParams?.purchasedID == songId
-                   }).first {
-                       let query = MPMediaQuery.songs()
-                       let trackTitleFilter = MPMediaPropertyPredicate(
-                           value: purchasedTrack.attributes?.name,
-                           forProperty: MPMediaItemPropertyTitle,
-                           comparisonType: .equalTo)
-                       let albumTitleFilter = MPMediaPropertyPredicate(
-                           value: purchasedTrack.attributes?.albumName,
-                           forProperty: MPMediaItemPropertyAlbumTitle,
-                           comparisonType: .equalTo)
-                       let filterPredicates: Set<MPMediaPredicate> = [trackTitleFilter, albumTitleFilter]
-                       query.filterPredicates = filterPredicates
-                       if (query.items?.count ?? 0) > 0 {
-                           print("🎵 ------ iTunes ---------")
-                           player.setQueue(with: query)
-                           result = true
-                       } else if let previewUrl2 = URL(string: previewUrl) {
-                           // 購入したけどまだ反映されていない場合。大体数時間~数日反映に時間がかかる。
-                           print("🎵 ------ preview ---------", previewUrl)
-                           setPlayer(previewUrl2)
-                           result = true
-                       }
-                   }
+                    if let purchasedTrack = response.results?.librarySongs?.data?.filter({ song in
+                        return song.attributes?.playParams?.purchasedID == songId
+                    }).first {
+                        let query = MPMediaQuery.songs()
+                        let trackTitleFilter = MPMediaPropertyPredicate(
+                            value: purchasedTrack.attributes?.name,
+                            forProperty: MPMediaItemPropertyTitle,
+                            comparisonType: .equalTo)
+                        let albumTitleFilter = MPMediaPropertyPredicate(
+                            value: purchasedTrack.attributes?.albumName,
+                            forProperty: MPMediaItemPropertyAlbumTitle,
+                            comparisonType: .equalTo)
+                        let filterPredicates: Set<MPMediaPredicate> = [
+                            trackTitleFilter, albumTitleFilter,
+                        ]
+                        query.filterPredicates = filterPredicates
+                        if (query.items?.count ?? 0) > 0 {
+                            print("🎵 ------ iTunes ---------")
+                            player.setQueue(with: query)
+                            result = true
+                        } else if let previewUrl2 = URL(string: previewUrl) {
+                            // 購入したけどまだ反映されていない場合。大体数時間~数日反映に時間がかかる。
+                            print("🎵 ------ preview ---------", previewUrl)
+                            setPlayer(previewUrl2)
+                            result = true
+                        }
+                    }
                 }
             }
 
@@ -361,27 +362,27 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
 
     }
 
-    private func setPlayer(_ previewUrl: URL) -> Void {
+    private func setPlayer(_ previewUrl: URL) {
         let playerItem = AVPlayerItem(url: previewUrl)
         previewPlayer = AVPlayer(playerItem: playerItem)
         previewPlayer!.addObserver(self, forKeyPath: "rate", options: [], context: nil)
     }
 
-    private func resetMusicKit() async -> Void {
+    private func resetMusicKit() async {
         ApplicationMusicPlayer.shared.stop()
         ApplicationMusicPlayer.shared.queue = []
         player.stop()
         player.setQueue(with: [])
     }
 
-    private func resetPreviewPlayer() async -> Void {
+    private func resetPreviewPlayer() async {
         if previewPlayer != nil {
             await previewPlayer?.pause()
             previewPlayer = nil
         }
     }
 
-    private func reset() async -> Void {
+    private func reset() async {
         await resetMusicKit()
         await resetPreviewPlayer()
     }
@@ -389,8 +390,9 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
     public override func observeValue(
         forKeyPath keyPath: String?,
         of object: Any?,
-        change: [NSKeyValueChangeKey : Any]?,
-        context: UnsafeMutableRawPointer?) {
+        change: [NSKeyValueChangeKey: Any]?,
+        context: UnsafeMutableRawPointer?
+    ) {
 
         if keyPath == "rate", let player = object as? AVPlayer, let item = player.currentItem {
             if player.rate == 1 {

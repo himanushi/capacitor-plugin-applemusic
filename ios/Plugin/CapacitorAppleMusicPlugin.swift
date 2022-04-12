@@ -225,7 +225,7 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
 
     func replaceName(_ name: String) -> String! {
         let regex = try! NSRegularExpression(
-            pattern: #"(?!^)(\[|\(|-|:|〜|~).*"#,
+            pattern: #"(?!^)(\[|\(|-|:|〜|~|,).*"#,
             options: NSRegularExpression.Options.caseInsensitive)
         let range = NSMakeRange(0, name.count)
         return

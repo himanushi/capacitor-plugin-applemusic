@@ -132,7 +132,7 @@ export class CapacitorAppleMusicWeb
   }): Promise<{ result: boolean }> {
     const replaceName = (name: string) => {
       // 名前が長すぎる場合は検索で引っかからないのでなるべく短い名前にする
-      return name.replace(/(?!^)(\[|\(|-|:|〜|~).*/g, '');
+      return name.replace(/(?!^)(\[|\(|-|:|〜|~|,).*/g, '');
     };
 
     const getLibrarySongs = async (name: string) => {

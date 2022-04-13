@@ -280,7 +280,8 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
 
             do {
 
-                if MusicAuthorization.currentStatus == .authorized {
+                let subscription = try await MusicSubscription.current
+                if MusicAuthorization.currentStatus == .authorized && subscription.canPlayCatalogContent {
 
                     await reset()
 

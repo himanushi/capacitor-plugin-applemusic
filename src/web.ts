@@ -73,6 +73,16 @@ export class CapacitorAppleMusicWeb
     return { result: authorized };
   }
 
+  async hasMusicSubscription(): Promise<{ result: boolean }> {
+    let result = false;
+    try {
+      result = await MusicKit.getInstance().hasMusicSubscription();
+    } catch (error) {
+      console.log(error);
+    }
+    return { result };
+  }
+
   async authorize(): Promise<{ result: boolean }> {
     try {
       await MusicKit.getInstance().authorize();
@@ -418,6 +428,7 @@ interface CapacitorAppleMusicPlugin {
   echo(options: { value: string }): Promise<{ value: string }>;
   configure(options: { config: MusicKit.Config }): Promise<{ result: boolean }>;
   isAuthorized(): Promise<{ result: boolean }>;
+  hasMusicSubscription(): Promise<{ result: boolean }>;
   authorize(): Promise<{ result: boolean }>;
   unauthorize(): Promise<{ result: boolean }>;
   setSong(options: {
@@ -470,6 +481,7 @@ declare namespace MusicKit {
     pause: () => Promise<void>;
     seekToTime: (playbackTime: number) => Promise<void>;
     addEventListener: (eventName: string, callback: any) => number;
+    hasMusicSubscription: () => boolean;
   }
 
   interface AppleMusicAPI {

@@ -112,6 +112,17 @@ public class CapacitorAppleMusicPlugin: CAPPlugin {
         call.resolve([resultKey: result])
     }
 
+    @objc func hasMusicSubscription(_ call: CAPPluginCall) {
+        Task {
+            let subscription = try await MusicSubscription.current
+        }
+        var result = false
+        if MusicAuthorization.currentStatus == .authorized {
+            result = true
+        }
+        call.resolve([resultKey: result])
+    }
+
     @objc func authorize(_ call: CAPPluginCall) {
         Task {
             var result = false

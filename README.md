@@ -16,6 +16,7 @@ npx cap sync
 * [`echo(...)`](#echo)
 * [`configure(...)`](#configure)
 * [`isAuthorized()`](#isauthorized)
+* [`hasMusicSubscription()`](#hasmusicsubscription)
 * [`authorize()`](#authorize)
 * [`unauthorize()`](#unauthorize)
 * [`setSong(...)`](#setsong)
@@ -69,6 +70,17 @@ configure(options: { config: MusicKit.Config; }) => Promise<{ result: boolean; }
 
 ```typescript
 isAuthorized() => Promise<{ result: boolean; }>
+```
+
+**Returns:** <code>Promise&lt;{ result: boolean; }&gt;</code>
+
+--------------------
+
+
+### hasMusicSubscription()
+
+```typescript
+hasMusicSubscription() => Promise<{ result: boolean; }>
 ```
 
 **Returns:** <code>Promise&lt;{ result: boolean; }&gt;</code>

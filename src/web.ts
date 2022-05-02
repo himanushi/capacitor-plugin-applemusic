@@ -145,32 +145,37 @@ export class CapacitorAppleMusicWeb
       return name.replace(/(?!^)(\[|\(|-|:|〜|~|,).*/g, '');
     };
 
-    const getLibrarySongs = async (name: string) => {
+    const getLibrarySong = async (name: string, songId: string) => {
       const endpoint = `/v1/me/library/search?term=${replaceName(
         name,
       )}&types=library-songs`;
-      return await getLoopLibrarySongs(endpoint);
+      return await getLoopLibrarySong(endpoint, songId);
     };
 
-    const getLoopLibrarySongs = async (endpoint: string) => {
-      const results: MusicKit.APIResultData[] = [];
+    const getLoopLibrarySong = async (
+      endpoint: string,
+      songId: string,
+    ): Promise<MusicKit.APIResultData | null> => {
       const response = await searchLibrarySongs(`${endpoint}&limit=25`);
 
-      if (!('results' in response.data)) return results;
+      if (!('results' in response.data)) return null;
 
-      if (response.data.results['library-songs']?.data) {
-        results.push(...response.data.results['library-songs'].data);
+      const track = response.data.results['library-songs']?.data.find(
+        trk => trk.attributes.playParams?.purchasedId === options.songId,
+      );
+
+      if (track) {
+        return track;
       }
 
       if (response.data.results['library-songs']?.next) {
-        results.push(
-          ...(await getLoopLibrarySongs(
-            response.data.results['library-songs']?.next,
-          )),
+        return await getLoopLibrarySong(
+          response.data.results['library-songs']?.next,
+          songId,
         );
       }
 
-      return results;
+      return null;
     };
 
     const searchLibrarySongs = async (endpoint: string) => {
@@ -205,11 +210,9 @@ export class CapacitorAppleMusicWeb
         console.log('🎵 ------ Apple Music ---------');
         await MusicKit.getInstance().setQueue({ songs: [options.songId] });
       } else {
-        const tracks = await getLibrarySongs(
+        const purchasedTrack = await getLibrarySong(
           options.songTitle ?? track.attributes.name,
-        );
-        const purchasedTrack = tracks.find(
-          trk => trk.attributes.playParams?.purchasedId === options.songId,
+          options.songId,
         );
         const previewUrl = track.attributes.previews[0]?.url;
 
@@ -230,9 +233,9 @@ export class CapacitorAppleMusicWeb
           return { result: false };
         }
 
-        const tracks = await getLibrarySongs(options.songTitle);
-        const purchasedTrack = tracks.find(
-          trk => trk.attributes.playParams?.purchasedId === options.songId,
+        const purchasedTrack = await getLibrarySong(
+          options.songTitle,
+          options.songId,
         );
         const previewUrl = options.previewUrl;
 
